@@ -3,28 +3,34 @@ import Link from "next/link"
 
 const products = [
   {
-    name: "Royal Banarasi Silk",
+    name: "Banarasi",
     price: "12,500",
     image: "/images/featured-1.jpg",
     tag: "Bestseller",
   },
   {
-    name: "Emerald Brocade Silk",
+    name: "Silk",
     price: "15,800",
     image: "/images/featured-2.jpg",
     tag: "New Arrival",
   },
   {
-    name: "Blush Organza Floral",
+    name: "Organza",
     price: "9,200",
     image: "/images/featured-3.jpg",
     tag: null,
   },
   {
-    name: "Golden Tussar Tribal",
+    name: "Mul Cotton",
     price: "11,000",
-    image: "/images/featured-4.jpg",
+    image: "/images/mul-cotton.jpg",
     tag: "Limited Edition",
+  },
+  {
+    name: "Linen",
+    price: "10,500",
+    image: "/images/linen.jpg",
+    tag: "New Arrival",
   },
 ]
 
