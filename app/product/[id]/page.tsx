@@ -1,16 +1,31 @@
-import Image from "next/image"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { notFound } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
-import { getProductById, getProductsByCategory, products } from "@/lib/products"
-import { ProductActions } from "@/components/product-actions"
+import { createClient } from "@/lib/supabase/server"
+import { ProductActionsDB } from "@/components/product-actions-db"
 
-export async function generateStaticParams() {
-  return products.map((product) => ({
-    id: product.id,
-  }))
+interface Product {
+  id: string
+  name: string
+  slug: string
+  price: number
+  price_in_cents: number
+  description: string
+  image_url: string
+  collection_id: string
+  fabric: string | null
+  length: string | null
+  width: string | null
+  blouse: string | null
+  care: string | null
+  is_active: boolean
+  collection?: {
+    id: string
+    name: string
+    slug: string
+  }
 }
 
 export default async function ProductDetailPage({
@@ -19,22 +34,42 @@ export default async function ProductDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const product = getProductById(id)
+  const supabase = await createClient()
+  
+  // Fetch product from database
+  const { data: product } = await supabase
+    .from("products")
+    .select(`
+      *,
+      collection:collections(id, name, slug)
+    `)
+    .eq("id", id)
+    .eq("is_active", true)
+    .single()
 
   if (!product) {
     notFound()
   }
 
-  const relatedProducts = getProductsByCategory(product.category)
-    .filter((p) => p.id !== product.id)
-    .slice(0, 3)
+  // Fetch related products from the same collection
+  let relatedProducts: Product[] = []
+  if (product.collection_id) {
+    const { data } = await supabase
+      .from("products")
+      .select("*")
+      .eq("collection_id", product.collection_id)
+      .eq("is_active", true)
+      .neq("id", product.id)
+      .limit(3)
+    
+    relatedProducts = data || []
+  }
 
-  const categoryHref =
-    product.category === "silk"
-      ? "/silk-sarees"
-      : product.category === "handloom-cotton"
-        ? "/handloom-cotton"
-        : "/semi-silk"
+  const categoryHref = product.collection?.slug 
+    ? `/${product.collection.slug}`
+    : "/all-sarees"
+  
+  const categoryLabel = product.collection?.name || "All Sarees"
 
   return (
     <main className="min-h-screen bg-background">
@@ -52,7 +87,7 @@ export default async function ProductDetailPage({
               href={categoryHref}
               className="transition-colors hover:text-foreground"
             >
-              {product.categoryLabel}
+              {categoryLabel}
             </Link>
             <span>/</span>
             <span className="text-foreground">{product.name}</span>
@@ -68,32 +103,35 @@ export default async function ProductDetailPage({
             className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to {product.categoryLabel}
+            Back to {categoryLabel}
           </Link>
 
           <div className="grid gap-12 lg:grid-cols-2">
             {/* Product Image */}
             <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-muted">
-              <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                priority
-              />
+              {product.image_url ? (
+                <img
+                  src={product.image_url}
+                  alt={product.name}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center">
+                  <span className="text-muted-foreground">No image</span>
+                </div>
+              )}
             </div>
 
             {/* Product Info */}
             <div className="flex flex-col">
               <span className="text-xs tracking-[0.3em] text-accent">
-                {product.categoryLabel.toUpperCase()}
+                {categoryLabel.toUpperCase()}
               </span>
               <h1 className="mt-2 font-serif text-3xl text-foreground md:text-4xl">
                 {product.name}
               </h1>
               <p className="mt-4 text-2xl font-semibold text-accent">
-                {product.price}
+                £{product.price.toFixed(2)}
               </p>
 
               <p className="mt-6 leading-relaxed text-muted-foreground">
@@ -101,59 +139,59 @@ export default async function ProductDetailPage({
               </p>
 
               {/* Product Details */}
-              {product.details && (
+              {(product.fabric || product.length || product.width || product.blouse || product.care) && (
                 <div className="mt-8 space-y-4 border-t border-border pt-8">
                   <h2 className="font-serif text-lg text-foreground">
                     Product Details
                   </h2>
                   <dl className="space-y-3 text-sm">
-                    {product.details.fabric && (
+                    {product.fabric && (
                       <div className="flex">
                         <dt className="w-24 flex-shrink-0 font-medium text-foreground">
                           Fabric
                         </dt>
                         <dd className="text-muted-foreground">
-                          {product.details.fabric}
+                          {product.fabric}
                         </dd>
                       </div>
                     )}
-                    {product.details.length && (
+                    {product.length && (
                       <div className="flex">
                         <dt className="w-24 flex-shrink-0 font-medium text-foreground">
                           Length
                         </dt>
                         <dd className="text-muted-foreground">
-                          {product.details.length}
+                          {product.length}
                         </dd>
                       </div>
                     )}
-                    {product.details.width && (
+                    {product.width && (
                       <div className="flex">
                         <dt className="w-24 flex-shrink-0 font-medium text-foreground">
                           Width
                         </dt>
                         <dd className="text-muted-foreground">
-                          {product.details.width}
+                          {product.width}
                         </dd>
                       </div>
                     )}
-                    {product.details.blouse && (
+                    {product.blouse && (
                       <div className="flex">
                         <dt className="w-24 flex-shrink-0 font-medium text-foreground">
                           Blouse
                         </dt>
                         <dd className="text-muted-foreground">
-                          {product.details.blouse}
+                          {product.blouse}
                         </dd>
                       </div>
                     )}
-                    {product.details.care && (
+                    {product.care && (
                       <div className="flex">
                         <dt className="w-24 flex-shrink-0 font-medium text-foreground">
                           Care
                         </dt>
                         <dd className="text-muted-foreground">
-                          {product.details.care}
+                          {product.care}
                         </dd>
                       </div>
                     )}
@@ -162,7 +200,7 @@ export default async function ProductDetailPage({
               )}
 
               {/* Add to Cart */}
-              <ProductActions product={product} />
+              <ProductActionsDB product={product} />
             </div>
           </div>
         </div>
@@ -183,19 +221,23 @@ export default async function ProductDetailPage({
                   className="group overflow-hidden rounded-lg border border-border bg-background transition-shadow hover:shadow-lg"
                 >
                   <div className="relative aspect-[4/5] overflow-hidden">
-                    <Image
-                      src={relatedProduct.image}
-                      alt={relatedProduct.name}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
+                    {relatedProduct.image_url ? (
+                      <img
+                        src={relatedProduct.image_url}
+                        alt={relatedProduct.name}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-muted">
+                        <span className="text-muted-foreground">No image</span>
+                      </div>
+                    )}
                   </div>
                   <div className="p-4">
                     <h3 className="font-serif text-lg text-foreground">
                       {relatedProduct.name}
                     </h3>
-                    <p className="mt-1 text-accent">{relatedProduct.price}</p>
+                    <p className="mt-1 text-accent">£{relatedProduct.price.toFixed(2)}</p>
                   </div>
                 </Link>
               ))}
