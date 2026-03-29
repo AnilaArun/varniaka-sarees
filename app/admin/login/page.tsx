@@ -11,6 +11,7 @@ export default function AdminLoginPage() {
   const [success, setSuccess] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [isSignUp, setIsSignUp] = useState(false)
+  const [isForgotPassword, setIsForgotPassword] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -21,7 +22,18 @@ export default function AdminLoginPage() {
     setLoading(true)
 
     try {
-      if (isSignUp) {
+      if (isForgotPassword) {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/admin/reset-password`,
+        })
+
+        if (error) {
+          setError(error.message)
+          return
+        }
+
+        setSuccess("Check your email for a password reset link.")
+      } else if (isSignUp) {
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -62,10 +74,14 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <h1 className="font-serif text-3xl font-bold text-foreground">
-            {isSignUp ? "Create Admin Account" : "Admin Login"}
+            {isForgotPassword ? "Reset Password" : isSignUp ? "Create Admin Account" : "Admin Login"}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            {isSignUp ? "Create an account to manage your store" : "Sign in to manage your Varniaka store"}
+            {isForgotPassword 
+              ? "Enter your email to receive a password reset link"
+              : isSignUp 
+                ? "Create an account to manage your store" 
+                : "Sign in to manage your Varniaka store"}
           </p>
         </div>
 
@@ -103,25 +119,27 @@ export default function AdminLoginPage() {
               />
             </div>
 
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-foreground"
-              >
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                placeholder="••••••••"
-              />
-            </div>
+            {!isForgotPassword && (
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-foreground"
+                >
+                  Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                  placeholder="••••••••"
+                />
+              </div>
+            )}
           </div>
 
           <button
@@ -130,24 +148,44 @@ export default function AdminLoginPage() {
             className="w-full rounded-md bg-primary px-4 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
           >
             {loading 
-              ? (isSignUp ? "Creating account..." : "Signing in...") 
-              : (isSignUp ? "Create Account" : "Sign in")}
+              ? (isForgotPassword ? "Sending..." : isSignUp ? "Creating account..." : "Signing in...") 
+              : (isForgotPassword ? "Send Reset Link" : isSignUp ? "Create Account" : "Sign in")}
           </button>
         </form>
         
-        <div className="text-center">
+        <div className="space-y-2 text-center">
+          {!isForgotPassword && !isSignUp && (
+            <button
+              type="button"
+              onClick={() => {
+                setIsForgotPassword(true)
+                setError(null)
+                setSuccess(null)
+              }}
+              className="block w-full text-sm text-muted-foreground hover:text-foreground"
+            >
+              Forgot your password?
+            </button>
+          )}
+          
           <button
             type="button"
             onClick={() => {
-              setIsSignUp(!isSignUp)
+              if (isForgotPassword) {
+                setIsForgotPassword(false)
+              } else {
+                setIsSignUp(!isSignUp)
+              }
               setError(null)
               setSuccess(null)
             }}
             className="text-sm text-muted-foreground hover:text-foreground"
           >
-            {isSignUp 
-              ? "Already have an account? Sign in" 
-              : "Need an account? Create one"}
+            {isForgotPassword
+              ? "Back to sign in"
+              : isSignUp 
+                ? "Already have an account? Sign in" 
+                : "Need an account? Create one"}
           </button>
         </div>
       </div>

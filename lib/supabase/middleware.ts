@@ -41,13 +41,15 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Allow access to the login page without authentication
+  // Allow access to the login and reset-password pages without authentication
   const isLoginPage = request.nextUrl.pathname === '/admin/login'
+  const isResetPasswordPage = request.nextUrl.pathname === '/admin/reset-password'
   
   if (
-    // if the user is not logged in and the admin path is accessed (except login), redirect to the login page
+    // if the user is not logged in and the admin path is accessed (except login/reset), redirect to the login page
     request.nextUrl.pathname.startsWith('/admin') &&
     !isLoginPage &&
+    !isResetPasswordPage &&
     !user
   ) {
     // no user, redirect to the admin login page
