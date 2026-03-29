@@ -21,7 +21,7 @@ const collections = [
     description: "Semi silk sarees adorned with zardozi and sequin embroidery",
     image: "/images/semi-silk-saree1.jpg",
     count: "24 Pieces",
-    href: "#",
+    href: "/semi-silk",
   },
 ]
 
