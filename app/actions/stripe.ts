@@ -35,7 +35,7 @@ export async function startCheckoutSession(cartItems: CartItem[]) {
 
   // Create Checkout Session with embedded UI
   const session = await stripe.checkout.sessions.create({
-    ui_mode: 'embedded',
+    ui_mode: 'embedded_page',
     redirect_on_completion: 'never',
     line_items: lineItems,
     mode: 'payment',
