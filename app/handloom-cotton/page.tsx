@@ -1,54 +1,35 @@
+import Image from "next/image"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import { getProductsByCategory } from "@/lib/products"
 import { createClient } from "@/lib/supabase/server"
 import { ProductCard } from "@/components/product-card"
 
-interface Product {
-  id: string
-  name: string
-  slug: string
-  price: number
-  price_in_cents: number
-  description: string
-  image_url: string
-  collection_id: string
-  is_active: boolean
-}
+// Static products from original data (Kalyani Cotton)
+const staticProducts = getProductsByCategory("handloom-cotton")
 
 export default async function HandloomCottonPage() {
+  // Fetch products from database
   const supabase = await createClient()
   
-  // First get the Handloom Cotton collection
-  const { data: collection } = await supabase
-    .from("collections")
-    .select("id, name, description")
-    .or("slug.eq.handloom-cotton,slug.eq.maheswari-cotton,name.ilike.%cotton%")
-    .limit(1)
-    .single()
-  
-  // Get products from this collection
-  let products: Product[] = []
-  if (collection) {
-    const { data } = await supabase
-      .from("products")
-      .select("*")
-      .eq("collection_id", collection.id)
-      .eq("is_active", true)
-      .order("created_at", { ascending: false })
-    
-    products = data || []
-  } else {
-    // Fallback: get all cotton-related products
-    const { data } = await supabase
-      .from("products")
-      .select("*")
-      .eq("is_active", true)
-      .order("created_at", { ascending: false })
-    
-    products = data || []
-  }
+  // Get all cotton-related products from database
+  const { data: dbProducts } = await supabase
+    .from("products")
+    .select(`
+      *,
+      collections(name, slug)
+    `)
+    .eq("is_active", true)
+    .order("created_at", { ascending: false })
+
+  // Filter to only cotton-related products
+  const cottonProducts = (dbProducts || []).filter((p: any) => 
+    p.collections?.slug?.toLowerCase().includes('cotton') ||
+    p.collections?.name?.toLowerCase().includes('cotton') ||
+    p.name?.toLowerCase().includes('cotton')
+  )
 
   return (
     <main className="min-h-screen bg-background">
@@ -78,26 +59,46 @@ export default async function HandloomCottonPage() {
         </div>
       </section>
 
-      {/* Products Section */}
-      <section className="px-6 py-16 lg:px-8 lg:py-24">
-        <div className="mx-auto max-w-7xl">
-          {/* Section Header */}
-          <div className="mb-12 text-center">
-            <span className="text-xs tracking-[0.4em] text-muted-foreground">
-              HANDLOOM COTTON
-            </span>
-            <h2 className="mt-4 font-serif text-3xl text-foreground md:text-4xl">
-              Everyday Elegance
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
-              Soft, lightweight, and breathable - perfect for all occasions.
-            </p>
-          </div>
+      {/* Kalyani Cotton Section - Static Products */}
+      {staticProducts.length > 0 && (
+        <section className="px-6 py-16 lg:px-8 lg:py-24">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-12 text-center">
+              <span className="text-xs tracking-[0.4em] text-muted-foreground">
+                KALYANI COTTON
+              </span>
+              <h2 className="mt-4 font-serif text-3xl text-foreground md:text-4xl">
+                Everyday Elegance
+              </h2>
+              <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
+                Soft, lightweight, and breathable Kalyani cotton fabric designed for everyday elegance.
+              </p>
+            </div>
 
-          {/* Product Grid */}
-          {products.length > 0 ? (
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {products.map((product) => (
+              {staticProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Database Products Section */}
+      {cottonProducts.length > 0 && (
+        <section className="border-t px-6 py-16 lg:px-8 lg:py-24">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-12 text-center">
+              <span className="text-xs tracking-[0.4em] text-muted-foreground">
+                MORE COTTON SAREES
+              </span>
+              <h2 className="mt-4 font-serif text-3xl text-foreground md:text-4xl">
+                New Arrivals
+              </h2>
+            </div>
+
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {cottonProducts.map((product: any) => (
                 <article
                   key={product.id}
                   className="group overflow-hidden rounded-lg border border-border bg-card transition-shadow hover:shadow-lg"
@@ -119,8 +120,13 @@ export default async function HandloomCottonPage() {
                     <h3 className="font-serif text-xl text-foreground">
                       {product.name}
                     </h3>
+                    {product.collections?.name && (
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {product.collections.name}
+                      </p>
+                    )}
                     <p className="mt-2 text-lg font-semibold text-accent">
-                      £{product.price.toFixed(2)}
+                      £{parseFloat(product.price).toFixed(2)}
                     </p>
                     <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
                       {product.description}
@@ -135,15 +141,9 @@ export default async function HandloomCottonPage() {
                 </article>
               ))}
             </div>
-          ) : (
-            <div className="py-12 text-center">
-              <p className="text-muted-foreground">
-                No products available in this collection yet.
-              </p>
-            </div>
-          )}
-        </div>
-      </section>
+          </div>
+        </section>
+      )}
 
       <Footer />
     </main>
