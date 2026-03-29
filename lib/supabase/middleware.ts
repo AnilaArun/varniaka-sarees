@@ -41,14 +41,25 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // Allow access to the login page without authentication
+  const isLoginPage = request.nextUrl.pathname === '/admin/login'
+  
   if (
-    // if the user is not logged in and the admin path is accessed, redirect to the login page
+    // if the user is not logged in and the admin path is accessed (except login), redirect to the login page
     request.nextUrl.pathname.startsWith('/admin') &&
+    !isLoginPage &&
     !user
   ) {
     // no user, redirect to the admin login page
     const url = request.nextUrl.clone()
     url.pathname = '/admin/login'
+    return NextResponse.redirect(url)
+  }
+  
+  // If user is logged in and on login page, redirect to admin dashboard
+  if (isLoginPage && user) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/admin'
     return NextResponse.redirect(url)
   }
 
