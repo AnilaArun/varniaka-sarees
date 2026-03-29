@@ -82,7 +82,7 @@ export function Featured() {
 
         <div className="mt-12 text-center">
           <Link
-            href="#"
+            href="/all-sarees"
             className="inline-flex items-center justify-center border border-foreground px-8 py-3 text-sm tracking-wider text-foreground transition-colors hover:bg-foreground hover:text-background"
           >
             VIEW ALL SAREES
