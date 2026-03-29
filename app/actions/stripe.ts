@@ -2,10 +2,46 @@
 
 import { stripe } from '@/lib/stripe'
 import { getProductById } from '@/lib/products'
+import { createClient } from '@/lib/supabase/server'
 
 export interface CartItem {
   id: string
   quantity: number
+}
+
+// Helper to get product from database or static file
+async function getProduct(id: string) {
+  // First try static products
+  const staticProduct = getProductById(id)
+  if (staticProduct) {
+    return {
+      id: staticProduct.id,
+      name: staticProduct.name,
+      description: staticProduct.description,
+      priceInCents: staticProduct.priceInCents,
+      stock: 999, // Static products have unlimited stock for now
+    }
+  }
+  
+  // Then try database
+  const supabase = await createClient()
+  const { data: dbProduct } = await supabase
+    .from('products')
+    .select('*')
+    .eq('id', id)
+    .single()
+  
+  if (dbProduct) {
+    return {
+      id: dbProduct.id,
+      name: dbProduct.name,
+      description: dbProduct.description || '',
+      priceInCents: dbProduct.price_in_cents,
+      stock: dbProduct.stock || 0,
+    }
+  }
+  
+  return null
 }
 
 export async function startCheckoutSession(cartItems: CartItem[]) {
@@ -14,10 +50,15 @@ export async function startCheckoutSession(cartItems: CartItem[]) {
   }
 
   // Validate all products and build line items
-  const lineItems = cartItems.map((item) => {
-    const product = getProductById(item.id)
+  const lineItems = await Promise.all(cartItems.map(async (item) => {
+    const product = await getProduct(item.id)
     if (!product) {
       throw new Error(`Product with id "${item.id}" not found`)
+    }
+    
+    // Check stock
+    if (product.stock < item.quantity) {
+      throw new Error(`Not enough stock for "${product.name}". Available: ${product.stock}`)
     }
 
     return {
@@ -34,7 +75,7 @@ export async function startCheckoutSession(cartItems: CartItem[]) {
       },
       quantity: item.quantity,
     }
-  })
+  }))
 
   // Create Checkout Session with embedded UI
   const session = await stripe.checkout.sessions.create({
