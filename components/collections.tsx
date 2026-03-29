@@ -7,7 +7,7 @@ const collections = [
     description: "Luxurious Banarasi & Kanjeevaram silks with intricate zari work",
     image: "/images/silk-saree.png",
     count: "48 Pieces",
-    href: "#",
+    href: "/silk-sarees",
   },
   {
     title: "Handloom Cotton",
