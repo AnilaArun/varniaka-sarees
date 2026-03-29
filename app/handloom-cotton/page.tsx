@@ -3,25 +3,9 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import { getProductsByCategory } from "@/lib/products"
 
-const kalyaniCottonSarees = [
-  {
-    id: 1,
-    name: "Kalyani Cotton - Pink Navy",
-    price: "£20",
-    image: "/images/kalyani-cotton-2.jpg",
-    description:
-      "Soft, lightweight, and breathable Kalyani cotton fabric designed for everyday elegance. Comfortable to wear with a smooth finish and classic appeal.",
-  },
-  {
-    id: 2,
-    name: "Kalyani Cotton - Mustard Purple",
-    price: "£20",
-    image: "/images/kalyani-cotton-3.jpg",
-    description:
-      "Soft, lightweight, and breathable Kalyani cotton fabric designed for everyday elegance. Comfortable to wear with a smooth finish and classic appeal.",
-  },
-]
+const kalyaniCottonSarees = getProductsByCategory("handloom-cotton")
 
 export default function HandloomCottonPage() {
   return (
@@ -94,9 +78,12 @@ export default function HandloomCottonPage() {
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                     {saree.description}
                   </p>
-                  <button className="mt-4 w-full rounded-md bg-primary px-4 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
+                  <Link
+                    href={`/product/${saree.id}`}
+                    className="mt-4 block w-full rounded-md bg-primary px-4 py-3 text-center text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                  >
                     View Details
-                  </button>
+                  </Link>
                 </div>
               </article>
             ))}

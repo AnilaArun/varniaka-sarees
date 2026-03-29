@@ -3,25 +3,9 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import { getProductsByCategory } from "@/lib/products"
 
-const kanchipuramSarees = [
-  {
-    id: 1,
-    name: "Pure Kanchipuram - Lavender Gold",
-    price: "£130",
-    image: "/images/kanchipuram-purple.jpg",
-    description:
-      "Exquisite pure Kanchipuram silk saree in a stunning lavender hue with rich red and gold zari border featuring traditional paisley and peacock motifs. Handwoven by master artisans for timeless elegance.",
-  },
-  {
-    id: 2,
-    name: "Pure Kanchipuram - Off White Red",
-    price: "£180",
-    image: "/images/kanchipuram-offwhite.jpg",
-    description:
-      "Elegant off-white Kanchipuram silk saree with delicate butta work and a magnificent red and gold zari border adorned with traditional elephant and floral motifs. A masterpiece of South Indian weaving.",
-  },
-]
+const kanchipuramSarees = getProductsByCategory("silk")
 
 export default function SilkSareesPage() {
   return (
@@ -95,9 +79,12 @@ export default function SilkSareesPage() {
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                     {saree.description}
                   </p>
-                  <button className="mt-4 w-full rounded-md bg-primary px-4 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
+                  <Link
+                    href={`/product/${saree.id}`}
+                    className="mt-4 block w-full rounded-md bg-primary px-4 py-3 text-center text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                  >
                     View Details
-                  </button>
+                  </Link>
                 </div>
               </article>
             ))}
