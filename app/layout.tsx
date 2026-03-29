@@ -2,6 +2,8 @@ import type { Metadata } from "next"
 import { Playfair_Display, Lato } from "next/font/google"
 
 import "./globals.css"
+import { CartProvider } from "@/lib/cart-context"
+import { CartSidebar } from "@/components/cart-sidebar"
 
 const _playfair = Playfair_Display({
   subsets: ["latin"],
@@ -26,7 +28,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased">{children}</body>
+      <body className="font-sans antialiased">
+          <CartProvider>
+            {children}
+            <CartSidebar />
+          </CartProvider>
+        </body>
     </html>
   )
 }

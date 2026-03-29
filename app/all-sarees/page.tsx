@@ -1,9 +1,9 @@
-import Image from "next/image"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { products } from "@/lib/products"
+import { ProductCard } from "@/components/product-card"
 
 export default function AllSareesPage() {
   const silkSarees = products.filter((p) => p.category === "silk")
@@ -57,40 +57,12 @@ export default function AllSareesPage() {
           </div>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {silkSarees.map((saree) => (
-              <div
+              <ProductCard
                 key={saree.id}
-                className="group overflow-hidden rounded-lg border border-border bg-card"
-              >
-                <div className="relative aspect-[3/4] overflow-hidden">
-                  <Image
-                    src={saree.image}
-                    alt={saree.name}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  />
-                  <span className="absolute left-3 top-3 bg-primary px-3 py-1 text-[10px] tracking-wider text-primary-foreground">
-                    SILK
-                  </span>
-                </div>
-                <div className="p-5">
-                  <h3 className="font-serif text-lg text-foreground">
-                    {saree.name}
-                  </h3>
-                  <p className="mt-1 text-lg font-medium text-accent">
-                    {saree.price}
-                  </p>
-                  <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
-                    {saree.description}
-                  </p>
-                  <Link
-                    href={`/product/${saree.id}`}
-                    className="mt-4 block w-full rounded-md bg-primary px-4 py-3 text-center text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-                  >
-                    View Details
-                  </Link>
-                </div>
-              </div>
+                product={saree}
+                badge="SILK"
+                badgeClassName="bg-primary text-primary-foreground"
+              />
             ))}
           </div>
         </div>
@@ -117,40 +89,12 @@ export default function AllSareesPage() {
           </div>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {semiSilkSarees.map((saree) => (
-              <div
+              <ProductCard
                 key={saree.id}
-                className="group overflow-hidden rounded-lg border border-border bg-background"
-              >
-                <div className="relative aspect-[3/4] overflow-hidden">
-                  <Image
-                    src={saree.image}
-                    alt={saree.name}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  />
-                  <span className="absolute left-3 top-3 bg-accent px-3 py-1 text-[10px] tracking-wider text-accent-foreground">
-                    SEMI SILK
-                  </span>
-                </div>
-                <div className="p-5">
-                  <h3 className="font-serif text-lg text-foreground">
-                    {saree.name}
-                  </h3>
-                  <p className="mt-1 text-lg font-medium text-accent">
-                    {saree.price}
-                  </p>
-                  <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
-                    {saree.description}
-                  </p>
-                  <Link
-                    href={`/product/${saree.id}`}
-                    className="mt-4 block w-full rounded-md bg-primary px-4 py-3 text-center text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-                  >
-                    View Details
-                  </Link>
-                </div>
-              </div>
+                product={saree}
+                badge="SEMI SILK"
+                badgeClassName="bg-accent text-accent-foreground"
+              />
             ))}
           </div>
         </div>
@@ -177,40 +121,12 @@ export default function AllSareesPage() {
           </div>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {cottonSarees.map((saree) => (
-              <div
+              <ProductCard
                 key={saree.id}
-                className="group overflow-hidden rounded-lg border border-border bg-card"
-              >
-                <div className="relative aspect-[3/4] overflow-hidden">
-                  <Image
-                    src={saree.image}
-                    alt={saree.name}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  />
-                  <span className="absolute left-3 top-3 bg-secondary px-3 py-1 text-[10px] tracking-wider text-secondary-foreground">
-                    COTTON
-                  </span>
-                </div>
-                <div className="p-5">
-                  <h3 className="font-serif text-lg text-foreground">
-                    {saree.name}
-                  </h3>
-                  <p className="mt-1 text-lg font-medium text-accent">
-                    {saree.price}
-                  </p>
-                  <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
-                    {saree.description}
-                  </p>
-                  <Link
-                    href={`/product/${saree.id}`}
-                    className="mt-4 block w-full rounded-md bg-primary px-4 py-3 text-center text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-                  >
-                    View Details
-                  </Link>
-                </div>
-              </div>
+                product={saree}
+                badge="COTTON"
+                badgeClassName="bg-secondary text-secondary-foreground"
+              />
             ))}
           </div>
         </div>

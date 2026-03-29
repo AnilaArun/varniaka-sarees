@@ -5,6 +5,7 @@ import { notFound } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { getProductById, getProductsByCategory, products } from "@/lib/products"
+import { ProductActions } from "@/components/product-actions"
 
 export async function generateStaticParams() {
   return products.map((product) => ({
@@ -160,19 +161,8 @@ export default async function ProductDetailPage({
                 </div>
               )}
 
-              {/* Contact CTA */}
-              <div className="mt-8 space-y-4 border-t border-border pt-8">
-                <p className="text-sm text-muted-foreground">
-                  Interested in this saree? Contact us for availability and
-                  ordering.
-                </p>
-                <Link
-                  href="/#contact"
-                  className="inline-block w-full rounded-md bg-primary px-6 py-3 text-center text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 md:w-auto"
-                >
-                  Contact Us to Order
-                </Link>
-              </div>
+              {/* Add to Cart */}
+              <ProductActions product={product} />
             </div>
           </div>
         </div>

@@ -3,7 +3,8 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Menu, X, ShoppingBag } from "lucide-react"
+import { Menu, X } from "lucide-react"
+import { CartButton } from "@/components/cart-button"
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -53,12 +54,7 @@ export function Navbar() {
 
         {/* Desktop Icons */}
         <div className="hidden items-center gap-4 md:flex">
-          <button
-            aria-label="Shopping bag"
-            className="text-primary-foreground/90 transition-colors hover:text-accent"
-          >
-            <ShoppingBag className="h-5 w-5" />
-          </button>
+          <CartButton />
         </div>
 
         {/* Mobile menu button */}
