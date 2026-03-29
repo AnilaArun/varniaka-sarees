@@ -43,6 +43,48 @@ export async function startCheckoutSession(cartItems: CartItem[]) {
       allowed_countries: ['GB', 'US', 'IN', 'CA', 'AU'],
     },
     billing_address_collection: 'required',
+    shipping_options: [
+      {
+        shipping_rate_data: {
+          type: 'fixed_amount',
+          fixed_amount: {
+            amount: 500,
+            currency: 'gbp',
+          },
+          display_name: 'Standard Delivery',
+          delivery_estimate: {
+            minimum: {
+              unit: 'business_day',
+              value: 5,
+            },
+            maximum: {
+              unit: 'business_day',
+              value: 7,
+            },
+          },
+        },
+      },
+      {
+        shipping_rate_data: {
+          type: 'fixed_amount',
+          fixed_amount: {
+            amount: 1200,
+            currency: 'gbp',
+          },
+          display_name: 'Express Delivery',
+          delivery_estimate: {
+            minimum: {
+              unit: 'business_day',
+              value: 1,
+            },
+            maximum: {
+              unit: 'business_day',
+              value: 3,
+            },
+          },
+        },
+      },
+    ],
   })
 
   return {
