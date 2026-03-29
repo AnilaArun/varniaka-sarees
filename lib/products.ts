@@ -2,6 +2,7 @@ export interface Product {
   id: string
   name: string
   price: string
+  priceInCents: number
   image: string
   description: string
   category: "silk" | "handloom-cotton" | "semi-silk"
@@ -21,6 +22,7 @@ export const products: Product[] = [
     id: "kanchipuram-lavender-gold",
     name: "Pure Kanchipuram - Lavender Gold",
     price: "£130",
+    priceInCents: 13000,
     image: "/images/kanchipuram-purple.jpg",
     description:
       "Exquisite pure Kanchipuram silk saree in a stunning lavender hue with rich red and gold zari border featuring traditional paisley and peacock motifs. Handwoven by master artisans for timeless elegance.",
@@ -38,6 +40,7 @@ export const products: Product[] = [
     id: "kanchipuram-offwhite-red",
     name: "Pure Kanchipuram - Off White Red",
     price: "£180",
+    priceInCents: 18000,
     image: "/images/kanchipuram-offwhite.jpg",
     description:
       "Elegant off-white Kanchipuram silk saree with delicate butta work and a magnificent red and gold zari border adorned with traditional elephant and floral motifs. A masterpiece of South Indian weaving.",
@@ -57,6 +60,7 @@ export const products: Product[] = [
     id: "kalyani-cotton-pink-navy",
     name: "Kalyani Cotton - Pink Navy",
     price: "£20",
+    priceInCents: 2000,
     image: "/images/kalyani-cotton-2.jpg",
     description:
       "Soft, lightweight, and breathable Kalyani cotton fabric designed for everyday elegance. Comfortable to wear with a smooth finish and classic appeal.",
@@ -74,6 +78,7 @@ export const products: Product[] = [
     id: "kalyani-cotton-mustard-purple",
     name: "Kalyani Cotton - Mustard Purple",
     price: "£20",
+    priceInCents: 2000,
     image: "/images/kalyani-cotton-3.jpg",
     description:
       "Soft, lightweight, and breathable Kalyani cotton fabric designed for everyday elegance. Comfortable to wear with a smooth finish and classic appeal.",
@@ -93,6 +98,7 @@ export const products: Product[] = [
     id: "semi-silk-mauve-green",
     name: "Semi Silk - Mauve Green",
     price: "£45",
+    priceInCents: 4500,
     image: "/images/semi-silk-1.jpg",
     description:
       "Elegant mauve semi-silk saree with a stunning green and gold zari border featuring intricate geometric patterns. Perfect blend of tradition and contemporary style for festive occasions.",
@@ -110,6 +116,7 @@ export const products: Product[] = [
     id: "semi-silk-pink-green",
     name: "Semi Silk - Pink Green",
     price: "£48",
+    priceInCents: 4800,
     image: "/images/semi-silk-2.jpg",
     description:
       "Beautiful pink and green dual-tone semi-silk saree with elaborate gold zari work. The contrasting colors and rich border make it ideal for celebrations and special events.",
@@ -127,6 +134,7 @@ export const products: Product[] = [
     id: "semi-silk-coral-blue",
     name: "Semi Silk - Coral Blue",
     price: "£50",
+    priceInCents: 5000,
     image: "/images/semi-silk-3.jpg",
     description:
       "Stunning coral semi-silk saree with a vibrant blue and gold zari border adorned with traditional elephant and floral motifs. A statement piece for weddings and festivities.",
