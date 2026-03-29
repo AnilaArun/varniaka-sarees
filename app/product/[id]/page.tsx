@@ -123,6 +123,16 @@ export default async function ProductDetailPage({
                   <span className="text-muted-foreground">No image</span>
                 </div>
               )}
+              {product.stock === 0 && (
+                <span className="absolute left-3 top-3 bg-primary px-3 py-1 text-[10px] tracking-wider text-primary-foreground">
+                  OUT OF STOCK
+                </span>
+              )}
+              {product.stock === 1 && (
+                <span className="absolute left-3 top-3 bg-amber-500 px-3 py-1 text-[10px] tracking-wider text-white">
+                  ONLY 1 LEFT
+                </span>
+              )}
             </div>
 
             {/* Product Info */}

@@ -116,11 +116,9 @@ export default async function HandloomCottonPage() {
                       </div>
                     )}
                     {product.stock === 0 && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-background/80">
-                        <span className="rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground">
-                          Out of Stock
-                        </span>
-                      </div>
+                      <span className="absolute left-3 top-3 bg-primary px-3 py-1 text-[10px] tracking-wider text-primary-foreground">
+                        OUT OF STOCK
+                      </span>
                     )}
                     {product.stock === 1 && (
                       <div className="absolute right-2 top-2 rounded-md bg-amber-500 px-2 py-1 text-xs font-medium text-white">
