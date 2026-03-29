@@ -10,6 +10,7 @@ interface Product {
   price: number
   price_in_cents: number
   image_url: string
+  stock: number
 }
 
 export function ProductActionsDB({ product }: { product: Product }) {
@@ -28,24 +29,40 @@ export function ProductActionsDB({ product }: { product: Product }) {
     setTimeout(() => setAdded(false), 2000)
   }
 
+  const isOutOfStock = product.stock === 0
+
   return (
     <div className="mt-8 space-y-4 border-t border-border pt-8">
-      <button
-        onClick={handleAddToCart}
-        className="flex w-full items-center justify-center gap-2 rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-      >
-        {added ? (
-          <>
-            <Check className="h-4 w-4" />
-            Added to Cart
-          </>
-        ) : (
-          <>
-            <ShoppingBag className="h-4 w-4" />
-            Add to Cart
-          </>
-        )}
-      </button>
+      {product.stock === 1 && (
+        <p className="text-sm font-medium text-amber-600">
+          Only 1 left in stock - order soon!
+        </p>
+      )}
+      {isOutOfStock ? (
+        <button
+          disabled
+          className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-md bg-muted px-6 py-3 text-sm font-medium text-muted-foreground"
+        >
+          Out of Stock
+        </button>
+      ) : (
+        <button
+          onClick={handleAddToCart}
+          className="flex w-full items-center justify-center gap-2 rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+        >
+          {added ? (
+            <>
+              <Check className="h-4 w-4" />
+              Added to Cart
+            </>
+          ) : (
+            <>
+              <ShoppingBag className="h-4 w-4" />
+              Add to Cart
+            </>
+          )}
+        </button>
+      )}
     </div>
   )
 }

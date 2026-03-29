@@ -26,6 +26,7 @@ interface ProductFormProps {
     width: string | null
     blouse: string | null
     care: string | null
+    stock: number | null
   }
 }
 
@@ -50,6 +51,7 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
     width: initialData?.width || "",
     blouse: initialData?.blouse || "",
     care: initialData?.care || "",
+    stock: initialData?.stock?.toString() || "1",
   })
 
   const generateSlug = (name: string) => {
@@ -118,6 +120,7 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
         width: formData.width || null,
         blouse: formData.blouse || null,
         care: formData.care || null,
+        stock: parseInt(formData.stock) || 0,
       }
 
       if (initialData?.id) {
@@ -260,6 +263,29 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
             />
           </div>
 
+          <div>
+            <label htmlFor="stock" className="block text-sm font-medium">
+              Stock Quantity *
+            </label>
+            <input
+              id="stock"
+              type="number"
+              min="0"
+              required
+              value={formData.stock}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, stock: e.target.value }))
+              }
+              className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              placeholder="1"
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              Set to 0 to mark as out of stock
+            </p>
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="collection" className="block text-sm font-medium">
               Collection

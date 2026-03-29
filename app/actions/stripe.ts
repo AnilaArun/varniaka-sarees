@@ -26,6 +26,9 @@ export async function startCheckoutSession(cartItems: CartItem[]) {
         product_data: {
           name: product.name,
           description: product.description,
+          metadata: {
+            product_id: product.id,
+          },
         },
         unit_amount: product.priceInCents,
       },
