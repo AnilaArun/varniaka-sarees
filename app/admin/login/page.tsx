@@ -8,28 +8,48 @@ export default function AdminLoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [isSignUp, setIsSignUp] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
+    setSuccess(null)
     setLoading(true)
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+      if (isSignUp) {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/admin`,
+          },
+        })
 
-      if (error) {
-        setError(error.message)
-        return
+        if (error) {
+          setError(error.message)
+          return
+        }
+
+        setSuccess("Check your email for a confirmation link to complete your registration.")
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        })
+
+        if (error) {
+          setError(error.message)
+          return
+        }
+
+        router.push("/admin")
+        router.refresh()
       }
-
-      router.push("/admin")
-      router.refresh()
     } catch {
       setError("An unexpected error occurred")
     } finally {
@@ -42,17 +62,23 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <h1 className="font-serif text-3xl font-bold text-foreground">
-            Admin Login
+            {isSignUp ? "Create Admin Account" : "Admin Login"}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Sign in to manage your Varniaka store
+            {isSignUp ? "Create an account to manage your store" : "Sign in to manage your Varniaka store"}
           </p>
         </div>
 
-        <form onSubmit={handleLogin} className="mt-8 space-y-6">
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           {error && (
             <div className="rounded-md bg-destructive/10 p-4 text-sm text-destructive">
               {error}
+            </div>
+          )}
+          
+          {success && (
+            <div className="rounded-md bg-green-100 p-4 text-sm text-green-800">
+              {success}
             </div>
           )}
 
@@ -103,9 +129,27 @@ export default function AdminLoginPage() {
             disabled={loading}
             className="w-full rounded-md bg-primary px-4 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
           >
-            {loading ? "Signing in..." : "Sign in"}
+            {loading 
+              ? (isSignUp ? "Creating account..." : "Signing in...") 
+              : (isSignUp ? "Create Account" : "Sign in")}
           </button>
         </form>
+        
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={() => {
+              setIsSignUp(!isSignUp)
+              setError(null)
+              setSuccess(null)
+            }}
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            {isSignUp 
+              ? "Already have an account? Sign in" 
+              : "Need an account? Create one"}
+          </button>
+        </div>
       </div>
     </div>
   )
