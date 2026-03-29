@@ -6,6 +6,14 @@ export async function updateSession(request: NextRequest) {
     request,
   })
 
+  // Only run auth checks for admin routes to avoid rate limiting on public pages
+  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin')
+  
+  if (!isAdminRoute) {
+    // For non-admin routes, just pass through without auth check
+    return supabaseResponse
+  }
+
   // With Fluid compute, don't put this client in a global environment
   // variable. Always create a new one on each request.
   const supabase = createServerClient(
@@ -47,7 +55,6 @@ export async function updateSession(request: NextRequest) {
   
   if (
     // if the user is not logged in and the admin path is accessed (except login/reset), redirect to the login page
-    request.nextUrl.pathname.startsWith('/admin') &&
     !isLoginPage &&
     !isResetPasswordPage &&
     !user
