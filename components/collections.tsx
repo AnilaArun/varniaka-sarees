@@ -7,18 +7,21 @@ const collections = [
     description: "Luxurious Banarasi & Kanjeevaram silks with intricate zari work",
     image: "/images/silk-saree.png",
     count: "48 Pieces",
+    href: "#",
   },
   {
     title: "Handloom Cotton",
     description: "Breathable handwoven cotton sarees with traditional block prints",
     image: "/images/cotton-saree.png",
     count: "36 Pieces",
+    href: "/handloom-cotton",
   },
   {
     title: "Semi Silk",
     description: "Semi silk sarees adorned with zardozi and sequin embroidery",
     image: "/images/semi-silk-saree1.jpg",
     count: "24 Pieces",
+    href: "#",
   },
 ]
 
@@ -45,7 +48,7 @@ export function Collections() {
           {collections.map((col) => (
             <Link
               key={col.title}
-              href="#"
+              href={col.href}
               className="group relative overflow-hidden"
             >
               <div className="relative aspect-[3/4] overflow-hidden">
