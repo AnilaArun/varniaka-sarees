@@ -36,31 +36,42 @@ export async function POST(request: Request) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session
 
-    // Get line items from the session
-    const lineItems = await stripe.checkout.sessions.listLineItems(session.id)
+    // Get line items from the session with expanded product data
+    const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
+      expand: ['data.price.product']
+    })
+
+    console.log("[v0] Processing checkout session:", session.id)
+    console.log("[v0] Line items count:", lineItems.data.length)
 
     // Reduce stock for each product
     for (const item of lineItems.data) {
-      const productId = item.price?.metadata?.product_id
+      // Get product metadata from the expanded product object
+      const product = item.price?.product as Stripe.Product | undefined
+      const productId = product?.metadata?.product_id
+
+      console.log("[v0] Processing item:", item.description, "Product ID:", productId)
 
       if (productId) {
         // Get current stock
-        const { data: product } = await supabaseAdmin
+        const { data: dbProduct, error } = await supabaseAdmin
           .from("products")
-          .select("stock")
+          .select("stock, name")
           .eq("id", productId)
           .single()
 
-        if (product && product.stock > 0) {
+        console.log("[v0] DB product:", dbProduct, "Error:", error)
+
+        if (dbProduct && dbProduct.stock > 0) {
           // Reduce stock by quantity ordered
-          const newStock = Math.max(0, product.stock - (item.quantity || 1))
+          const newStock = Math.max(0, dbProduct.stock - (item.quantity || 1))
           
-          await supabaseAdmin
+          const { error: updateError } = await supabaseAdmin
             .from("products")
             .update({ stock: newStock })
             .eq("id", productId)
 
-          console.log(`Reduced stock for product ${productId}: ${product.stock} -> ${newStock}`)
+          console.log(`[v0] Reduced stock for "${dbProduct.name}" (${productId}): ${dbProduct.stock} -> ${newStock}`, updateError ? `Error: ${updateError}` : "Success")
         }
       }
     }
