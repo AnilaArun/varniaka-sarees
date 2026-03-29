@@ -115,6 +115,18 @@ export default async function HandloomCottonPage() {
                         <span className="text-muted-foreground">No image</span>
                       </div>
                     )}
+                    {product.stock === 0 && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-background/80">
+                        <span className="rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground">
+                          Out of Stock
+                        </span>
+                      </div>
+                    )}
+                    {product.stock === 1 && (
+                      <div className="absolute right-2 top-2 rounded-md bg-amber-500 px-2 py-1 text-xs font-medium text-white">
+                        Only 1 left
+                      </div>
+                    )}
                   </div>
                   <div className="p-6">
                     <h3 className="font-serif text-xl text-foreground">
@@ -131,12 +143,21 @@ export default async function HandloomCottonPage() {
                     <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
                       {product.description}
                     </p>
-                    <Link
-                      href={`/product/${product.id}`}
-                      className="mt-4 block w-full rounded-md bg-primary px-4 py-3 text-center text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-                    >
-                      View Details
-                    </Link>
+                    {product.stock === 0 ? (
+                      <button
+                        disabled
+                        className="mt-4 block w-full cursor-not-allowed rounded-md bg-muted px-4 py-3 text-center text-sm font-medium text-muted-foreground"
+                      >
+                        Out of Stock
+                      </button>
+                    ) : (
+                      <Link
+                        href={`/product/${product.id}`}
+                        className="mt-4 block w-full rounded-md bg-primary px-4 py-3 text-center text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                      >
+                        View Details
+                      </Link>
+                    )}
                   </div>
                 </article>
               ))}
