@@ -8,7 +8,7 @@ const kanchipuramSarees = [
   {
     id: 1,
     name: "Pure Kanchipuram - Lavender Gold",
-    price: "£250",
+    price: "£130",
     image: "/images/kanchipuram-purple.jpg",
     description:
       "Exquisite pure Kanchipuram silk saree in a stunning lavender hue with rich red and gold zari border featuring traditional paisley and peacock motifs. Handwoven by master artisans for timeless elegance.",
@@ -16,7 +16,7 @@ const kanchipuramSarees = [
   {
     id: 2,
     name: "Pure Kanchipuram - Off White Red",
-    price: "£280",
+    price: "£180",
     image: "/images/kanchipuram-offwhite.jpg",
     description:
       "Elegant off-white Kanchipuram silk saree with delicate butta work and a magnificent red and gold zari border adorned with traditional elephant and floral motifs. A masterpiece of South Indian weaving.",
