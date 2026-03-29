@@ -3,33 +3,9 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import { getProductsByCategory } from "@/lib/products"
 
-const semiSilkSarees = [
-  {
-    id: 1,
-    name: "Semi Silk - Mauve Green",
-    price: "£45",
-    image: "/images/semi-silk-1.jpg",
-    description:
-      "Elegant mauve semi-silk saree with a stunning green and gold zari border featuring intricate geometric patterns. Perfect blend of tradition and contemporary style for festive occasions.",
-  },
-  {
-    id: 2,
-    name: "Semi Silk - Pink Green",
-    price: "£48",
-    image: "/images/semi-silk-2.jpg",
-    description:
-      "Beautiful pink and green dual-tone semi-silk saree with elaborate gold zari work. The contrasting colors and rich border make it ideal for celebrations and special events.",
-  },
-  {
-    id: 3,
-    name: "Semi Silk - Coral Blue",
-    price: "£50",
-    image: "/images/semi-silk-3.jpg",
-    description:
-      "Stunning coral semi-silk saree with a vibrant blue and gold zari border adorned with traditional elephant and floral motifs. A statement piece for weddings and festivities.",
-  },
-]
+const semiSilkSarees = getProductsByCategory("semi-silk")
 
 export default function SemiSilkPage() {
   return (
@@ -103,9 +79,12 @@ export default function SemiSilkPage() {
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                     {saree.description}
                   </p>
-                  <button className="mt-4 w-full rounded-md bg-primary px-4 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
+                  <Link
+                    href={`/product/${saree.id}`}
+                    className="mt-4 block w-full rounded-md bg-primary px-4 py-3 text-center text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                  >
                     View Details
-                  </button>
+                  </Link>
                 </div>
               </article>
             ))}
