@@ -116,13 +116,17 @@ export function CartSidebar() {
                 <span>Subtotal</span>
                 <span>{formatPrice(totalPrice)}</span>
               </div>
-              <p className="mb-4 text-xs text-muted-foreground">
-                Shipping and taxes calculated at checkout
-              </p>
-              <Button asChild className="w-full" size="lg">
-                <Link href="/checkout" onClick={() => setIsOpen(false)}>
-                  Proceed to Checkout
-                </Link>
+              
+              {/* Coming Soon Notice */}
+              <div className="mb-4 rounded-lg border border-primary/20 bg-primary/5 p-4 text-center">
+                <p className="text-sm font-medium text-primary">Coming Soon</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Online checkout will be available shortly. For now, please contact us to place your order.
+                </p>
+              </div>
+              
+              <Button disabled className="w-full" size="lg">
+                Checkout Coming Soon
               </Button>
               <Button
                 variant="outline"
