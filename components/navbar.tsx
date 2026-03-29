@@ -6,11 +6,11 @@ import Image from "next/image"
 import { Menu, X, ShoppingBag } from "lucide-react"
 
 const navLinks = [
-  { href: "#home", label: "Home" },
-  { href: "#collections", label: "Collections" },
-  { href: "#lookbook", label: "Lookbook" },
-  { href: "#story", label: "Our Story" },
-  { href: "#contact", label: "Contact" },
+  { href: "/", label: "Home" },
+  { href: "/#collections", label: "Collections" },
+  { href: "/#lookbook", label: "Lookbook" },
+  { href: "/#story", label: "Our Story" },
+  { href: "/#contact", label: "Contact" },
 ]
 
 export function Navbar() {
