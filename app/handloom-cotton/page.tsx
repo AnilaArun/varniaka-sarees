@@ -7,14 +7,6 @@ import { Footer } from "@/components/footer"
 const kalyaniCottonSarees = [
   {
     id: 1,
-    name: "Kalyani Cotton - Magenta Gold",
-    price: "£20",
-    image: "/images/kalyani-cotton-1.jpg",
-    description:
-      "Soft, lightweight, and breathable Kalyani cotton fabric designed for everyday elegance. Comfortable to wear with a smooth finish and classic appeal.",
-  },
-  {
-    id: 2,
     name: "Kalyani Cotton - Pink Navy",
     price: "£20",
     image: "/images/kalyani-cotton-2.jpg",
@@ -22,7 +14,7 @@ const kalyaniCottonSarees = [
       "Soft, lightweight, and breathable Kalyani cotton fabric designed for everyday elegance. Comfortable to wear with a smooth finish and classic appeal.",
   },
   {
-    id: 3,
+    id: 2,
     name: "Kalyani Cotton - Mustard Purple",
     price: "£20",
     image: "/images/kalyani-cotton-3.jpg",
