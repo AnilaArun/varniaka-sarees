@@ -36,14 +36,17 @@ export default async function ProductDetailPage({
   const { id } = await params
   const supabase = await createClient()
   
-  // Fetch product from database
+  // Check if id is a UUID or a slug
+  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
+  
+  // Fetch product from database by UUID or slug
   const { data: product } = await supabase
     .from("products")
     .select(`
       *,
       collection:collections(id, name, slug)
     `)
-    .eq("id", id)
+    .eq(isUUID ? "id" : "slug", id)
     .eq("is_active", true)
     .single()
 
