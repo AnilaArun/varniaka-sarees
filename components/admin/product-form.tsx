@@ -3,7 +3,6 @@
 import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import Image from "next/image"
 import { Camera, Upload, X, Loader2 } from "lucide-react"
 
 interface Collection {
@@ -157,11 +156,10 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
         <div className="flex flex-col items-center gap-4">
           {formData.image_url ? (
             <div className="relative aspect-square w-full max-w-xs overflow-hidden rounded-lg border">
-              <Image
+              <img
                 src={formData.image_url}
                 alt="Product preview"
-                fill
-                className="object-cover"
+                className="h-full w-full object-cover"
               />
               <button
                 type="button"
