@@ -48,7 +48,7 @@ export async function startCheckoutSession(cartItems: CartItem[]) {
         shipping_rate_data: {
           type: 'fixed_amount',
           fixed_amount: {
-            amount: 500,
+            amount: 499,
             currency: 'gbp',
           },
           display_name: 'Standard Delivery',
