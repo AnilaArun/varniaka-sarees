@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import Link from "next/link"
-import Image from "next/image"
-import { Plus, Pencil, Trash2 } from "lucide-react"
+import { Plus, Pencil } from "lucide-react"
 import { DeleteProductButton } from "@/components/admin/delete-product-button"
 
 export default async function AdminProductsPage() {
@@ -39,11 +38,10 @@ export default async function AdminProductsPage() {
             >
               <div className="relative aspect-square">
                 {product.image_url ? (
-                  <Image
+                  <img
                     src={product.image_url}
                     alt={product.name}
-                    fill
-                    className="object-cover"
+                    className="h-full w-full object-cover"
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center bg-muted">

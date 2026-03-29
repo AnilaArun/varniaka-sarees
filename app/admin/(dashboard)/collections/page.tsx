@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import Link from "next/link"
-import Image from "next/image"
-import { Plus, Pencil, Trash2 } from "lucide-react"
+import { Plus, Pencil } from "lucide-react"
 import { DeleteCollectionButton } from "@/components/admin/delete-collection-button"
 
 export default async function AdminCollectionsPage() {
@@ -39,11 +38,10 @@ export default async function AdminCollectionsPage() {
             >
               <div className="relative aspect-video">
                 {collection.image_url ? (
-                  <Image
+                  <img
                     src={collection.image_url}
                     alt={collection.name}
-                    fill
-                    className="object-cover"
+                    className="h-full w-full object-cover"
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center bg-muted">
