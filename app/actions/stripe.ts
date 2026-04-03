@@ -19,7 +19,7 @@ async function getProduct(id: string) {
       name: staticProduct.name,
       description: staticProduct.description,
       priceInCents: staticProduct.priceInCents,
-      stock: 999, // Static products have unlimited stock for now
+      stock:1, // Static products have unlimited stock for now
     }
   }
   

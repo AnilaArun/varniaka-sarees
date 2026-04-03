@@ -21,8 +21,8 @@ export const products: Product[] = [
   {
     id: "kanchipuram-lavender-gold",
     name: "Pure Kanchipuram - Lavender Gold",
-    price: "£130",
-    priceInCents: 13000,
+    price: "£109",
+    priceInCents: 10900,
     image: "/images/kanchipuram-purple.jpg",
     description:
       "Exquisite pure Kanchipuram silk saree in a stunning lavender hue with rich red and gold zari border featuring traditional paisley and peacock motifs. Handwoven by master artisans for timeless elegance.",
@@ -39,8 +39,8 @@ export const products: Product[] = [
   {
     id: "kanchipuram-offwhite-red",
     name: "Pure Kanchipuram - Off White Red",
-    price: "£180",
-    priceInCents: 18000,
+    price: "£135",
+    priceInCents: 13500,
     image: "/images/kanchipuram-offwhite.jpg",
     description:
       "Elegant off-white Kanchipuram silk saree with delicate butta work and a magnificent red and gold zari border adorned with traditional elephant and floral motifs. A masterpiece of South Indian weaving.",
@@ -97,8 +97,8 @@ export const products: Product[] = [
   {
     id: "semi-silk-mauve-green",
     name: "Semi Silk - Mauve Green",
-    price: "£45",
-    priceInCents: 4500,
+    price: "£35",
+    priceInCents: 3500,
     image: "/images/semi-silk-1.jpg",
     description:
       "Elegant mauve semi-silk saree with a stunning green and gold zari border featuring intricate geometric patterns. Perfect blend of tradition and contemporary style for festive occasions.",
@@ -112,7 +112,7 @@ export const products: Product[] = [
       care: "Dry clean recommended. Store in cool, dry place.",
     },
   },
-  {
+  /* {
     id: "semi-silk-pink-green",
     name: "Semi Silk - Pink Green",
     price: "£48",
@@ -129,12 +129,12 @@ export const products: Product[] = [
       blouse: "0.8 meters unstitched blouse piece included",
       care: "Dry clean recommended. Store in cool, dry place.",
     },
-  },
+  }, */
   {
     id: "semi-silk-coral-blue",
     name: "Semi Silk - Coral Blue",
-    price: "£50",
-    priceInCents: 5000,
+    price: "£28",
+    priceInCents: 2800,
     image: "/images/semi-silk-3.jpg",
     description:
       "Stunning coral semi-silk saree with a vibrant blue and gold zari border adorned with traditional elephant and floral motifs. A statement piece for weddings and festivities.",
