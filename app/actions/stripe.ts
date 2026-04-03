@@ -11,20 +11,9 @@ export interface CartItem {
 
 // Helper to get product from database or static file
 async function getProduct(id: string) {
-  // First try static products
-  const staticProduct = getProductById(id)
-  if (staticProduct) {
-    return {
-      id: staticProduct.id,
-      name: staticProduct.name,
-      description: staticProduct.description,
-      priceInCents: staticProduct.priceInCents,
-      stock:1, // Static products have unlimited stock for now
-    }
-  }
-  
-  // Then try database
   const supabase = await createClient()
+  
+  // First try database (prioritize DB products over static ones)
   const { data: dbProduct } = await supabase
     .from('products')
     .select('*')
@@ -38,6 +27,18 @@ async function getProduct(id: string) {
       description: dbProduct.description || '',
       priceInCents: dbProduct.price_in_cents,
       stock: dbProduct.stock || 0,
+    }
+  }
+  
+  // Fall back to static products if not in database
+  const staticProduct = getProductById(id)
+  if (staticProduct) {
+    return {
+      id: staticProduct.id,
+      name: staticProduct.name,
+      description: staticProduct.description,
+      priceInCents: staticProduct.priceInCents,
+      stock: 0, // Static products without DB entry should show as out of stock for inventory purposes
     }
   }
   
