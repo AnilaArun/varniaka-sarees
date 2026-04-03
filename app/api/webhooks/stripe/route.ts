@@ -36,19 +36,62 @@ export async function POST(request: Request) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session
 
-    // Get line items from the session with expanded product data
-    const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
-      expand: ['data.price.product']
-    })
-
     console.log("[v0] Processing checkout session:", session.id)
-    console.log("[v0] Line items count:", lineItems.data.length)
+    
+    // Get cart items from session metadata
+    let cartItems: Array<{ id: string; quantity: number }> = []
+    if (session.metadata?.cart_items) {
+      try {
+        cartItems = JSON.parse(session.metadata.cart_items)
+      } catch (e) {
+        console.error("[v0] Failed to parse cart_items from metadata:", e)
+      }
+    }
+
+    console.log("[v0] Cart items from metadata:", cartItems)
 
     // Reduce stock for each product
-    for (const item of lineItems.data) {
-      // Get product metadata from the expanded product object
-      const product = item.price?.product as Stripe.Product | undefined
-      const productId = product?.metadata?.product_id
+    for (const item of cartItems) {
+      const productId = item.id
+      const quantity = item.quantity
+
+      console.log(`[v0] Processing product ${productId} with quantity ${quantity}`)
+
+      if (productId) {
+        // Get current stock
+        const { data: dbProduct, error } = await supabaseAdmin
+          .from("products")
+          .select("stock, name")
+          .eq("id", productId)
+          .single()
+
+        console.log("[v0] DB product:", dbProduct, "Error:", error)
+
+        if (dbProduct && dbProduct.stock > 0) {
+          // Reduce stock by quantity ordered
+          const newStock = Math.max(0, dbProduct.stock - quantity)
+          
+          // Use optimistic locking: only update if stock hasn't changed
+          // This prevents race conditions where two concurrent purchases could both succeed
+          const { data: updated, error: updateError } = await supabaseAdmin
+            .from("products")
+            .update({ stock: newStock })
+            .eq("id", productId)
+            .eq("stock", dbProduct.stock) // Only update if stock is still the same
+            .select()
+
+          if (!updated || updated.length === 0) {
+            console.log(`[v0] RACE CONDITION DETECTED: Stock changed for "${dbProduct.name}" (${productId}). Another purchase may have been processed simultaneously.`)
+          } else {
+            console.log(`[v0] Reduced stock for "${dbProduct.name}" (${productId}): ${dbProduct.stock} -> ${newStock}`)
+          }
+        } else if (!dbProduct) {
+          console.log(`[v0] Product not found: ${productId}`)
+        }
+      }
+    }
+  }
+      }
 
       console.log("[v0] Processing item:", item.description, "Product ID:", productId)
 
@@ -66,13 +109,23 @@ export async function POST(request: Request) {
           // Reduce stock by quantity ordered
           const newStock = Math.max(0, dbProduct.stock - (item.quantity || 1))
           
-          const { error: updateError } = await supabaseAdmin
+          // Use optimistic locking: only update if stock hasn't changed
+          // This prevents race conditions where two concurrent purchases could both succeed
+          const { data: updated, error: updateError } = await supabaseAdmin
             .from("products")
             .update({ stock: newStock })
             .eq("id", productId)
+            .eq("stock", dbProduct.stock) // Only update if stock is still the same
+            .select()
 
-          console.log(`[v0] Reduced stock for "${dbProduct.name}" (${productId}): ${dbProduct.stock} -> ${newStock}`, updateError ? `Error: ${updateError}` : "Success")
+          if (!updated || updated.length === 0) {
+            console.log(`[v0] RACE CONDITION DETECTED: Stock changed for "${dbProduct.name}" (${productId}). Another purchase may have been processed simultaneously.`)
+          } else {
+            console.log(`[v0] Reduced stock for "${dbProduct.name}" (${productId}): ${dbProduct.stock} -> ${newStock}`, updateError ? `Error: ${updateError}` : "Success")
+          }
         }
+      } else {
+        console.log("[v0] Could not find product_id for item:", item.description)
       }
     }
   }

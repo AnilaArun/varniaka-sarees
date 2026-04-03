@@ -67,9 +67,6 @@ export async function startCheckoutSession(cartItems: CartItem[]) {
         product_data: {
           name: product.name,
           description: product.description,
-          metadata: {
-            product_id: product.id,
-          },
         },
         unit_amount: product.priceInCents,
       },
@@ -78,11 +75,18 @@ export async function startCheckoutSession(cartItems: CartItem[]) {
   }))
 
   // Create Checkout Session with embedded UI
+  // Store cart items in session metadata for webhook to use
   const session = await stripe.checkout.sessions.create({
     ui_mode: 'embedded_page',
     redirect_on_completion: 'never',
     line_items: lineItems,
     mode: 'payment',
+    metadata: {
+      cart_items: JSON.stringify(cartItems.map(item => ({
+        id: item.id,
+        quantity: item.quantity,
+      }))),
+    },
     shipping_address_collection: {
       allowed_countries: ['GB', 'US', 'IN', 'CA', 'AU'],
     },
