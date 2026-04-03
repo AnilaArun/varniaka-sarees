@@ -1,7 +1,6 @@
 'use server'
 
 import { stripe } from '@/lib/stripe'
-import { getProductById } from '@/lib/products'
 import { createClient } from '@/lib/supabase/server'
 
 export interface CartItem {
@@ -9,40 +8,27 @@ export interface CartItem {
   quantity: number
 }
 
-// Helper to get product from database or static file
+// Helper to get product from database
 async function getProduct(id: string) {
   const supabase = await createClient()
   
-  // First try database (prioritize DB products over static ones)
-  const { data: dbProduct } = await supabase
+  const { data: dbProduct, error } = await supabase
     .from('products')
     .select('*')
     .eq('id', id)
     .single()
   
-  if (dbProduct) {
-    return {
-      id: dbProduct.id,
-      name: dbProduct.name,
-      description: dbProduct.description || '',
-      priceInCents: dbProduct.price_in_cents,
-      stock: dbProduct.stock || 0,
-    }
+  if (error || !dbProduct) {
+    return null
   }
-  
-  // Fall back to static products if not in database
-  const staticProduct = getProductById(id)
-  if (staticProduct) {
-    return {
-      id: staticProduct.id,
-      name: staticProduct.name,
-      description: staticProduct.description,
-      priceInCents: staticProduct.priceInCents,
-      stock: 0, // Static products without DB entry should show as out of stock for inventory purposes
-    }
+
+  return {
+    id: dbProduct.id,
+    name: dbProduct.name,
+    description: dbProduct.description || '',
+    priceInCents: dbProduct.price_in_cents,
+    stock: dbProduct.stock || 0,
   }
-  
-  return null
 }
 
 export async function startCheckoutSession(cartItems: CartItem[]) {

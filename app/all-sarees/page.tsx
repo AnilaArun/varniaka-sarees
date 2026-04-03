@@ -2,13 +2,37 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
-import { products } from "@/lib/products"
+import { createClient } from "@/lib/supabase/server"
 import { ProductCard } from "@/components/product-card"
 
-export default function AllSareesPage() {
-  const silkSarees = products.filter((p) => p.category === "silk")
-  const semiSilkSarees = products.filter((p) => p.category === "semi-silk")
-  const cottonSarees = products.filter((p) => p.category === "handloom-cotton")
+export default async function AllSareesPage() {
+  const supabase = await createClient()
+  
+  // Fetch all products from database
+  const { data: dbProducts } = await supabase
+    .from("products")
+    .select(`
+      *,
+      collections(name, slug)
+    `)
+    .eq("is_active", true)
+    .order("created_at", { ascending: false })
+
+  const products = dbProducts || []
+  
+  // Categorize products
+  const silkSarees = products.filter((p: any) => 
+    p.collections?.slug?.toLowerCase().includes('silk') && 
+    !p.collections?.slug?.toLowerCase().includes('semi')
+  )
+  
+  const semiSilkSarees = products.filter((p: any) => 
+    p.collections?.slug?.toLowerCase().includes('semi-silk')
+  )
+  
+  const cottonSarees = products.filter((p: any) => 
+    p.collections?.slug?.toLowerCase().includes('cotton')
+  )
 
   return (
     <main className="min-h-screen bg-background">
@@ -37,102 +61,139 @@ export default function AllSareesPage() {
       </section>
 
       {/* Silk Sarees Section */}
-      <section className="bg-background px-6 py-16 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-10 flex items-center justify-between">
-            <div>
-              <h2 className="font-serif text-2xl text-foreground md:text-3xl">
-                Silk Sarees
-              </h2>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Luxurious Kanchipuram silks with intricate zari work
-              </p>
+      {silkSarees.length > 0 && (
+        <section className="bg-background px-6 py-16 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-10 flex items-center justify-between">
+              <div>
+                <h2 className="font-serif text-2xl text-foreground md:text-3xl">
+                  Silk Sarees
+                </h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Luxurious Kanchipuram silks with intricate zari work
+                </p>
+              </div>
+              <Link
+                href="/silk-sarees"
+                className="text-sm text-accent hover:underline"
+              >
+                View All Silk
+              </Link>
             </div>
-            <Link
-              href="/silk-sarees"
-              className="text-sm text-accent hover:underline"
-            >
-              View All Silk
-            </Link>
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {silkSarees.map((saree: any) => (
+                <ProductCard
+                  key={saree.id}
+                  product={{
+                    id: saree.id,
+                    name: saree.name,
+                    description: saree.description,
+                    image: saree.image,
+                    price: `£${(saree.price_in_cents / 100).toFixed(2)}`,
+                    priceInCents: saree.price_in_cents,
+                    category: 'silk',
+                    categoryLabel: 'Silk Sarees',
+                  }}
+                  stock={saree.stock}
+                  badge="SILK"
+                  badgeClassName="bg-primary text-primary-foreground"
+                />
+              ))}
+            </div>
           </div>
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {silkSarees.map((saree) => (
-              <ProductCard
-                key={saree.id}
-                product={saree}
-                badge="SILK"
-                badgeClassName="bg-primary text-primary-foreground"
-              />
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Semi Silk Sarees Section */}
-      <section className="bg-card px-6 py-16 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-10 flex items-center justify-between">
-            <div>
-              <h2 className="font-serif text-2xl text-foreground md:text-3xl">
-                Semi Silk Sarees
-              </h2>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Perfect blend of silk and cotton for festive occasions
-              </p>
+      {semiSilkSarees.length > 0 && (
+        <section className="bg-card px-6 py-16 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-10 flex items-center justify-between">
+              <div>
+                <h2 className="font-serif text-2xl text-foreground md:text-3xl">
+                  Semi Silk Sarees
+                </h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Perfect blend of silk and cotton for festive occasions
+                </p>
+              </div>
+              <Link
+                href="/semi-silk"
+                className="text-sm text-accent hover:underline"
+              >
+                View All Semi Silk
+              </Link>
             </div>
-            <Link
-              href="/semi-silk"
-              className="text-sm text-accent hover:underline"
-            >
-              View All Semi Silk
-            </Link>
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {semiSilkSarees.map((saree: any) => (
+                <ProductCard
+                  key={saree.id}
+                  product={{
+                    id: saree.id,
+                    name: saree.name,
+                    description: saree.description,
+                    image: saree.image,
+                    price: `£${(saree.price_in_cents / 100).toFixed(2)}`,
+                    priceInCents: saree.price_in_cents,
+                    category: 'semi-silk',
+                    categoryLabel: 'Semi Silk',
+                  }}
+                  stock={saree.stock}
+                  badge="SEMI SILK"
+                  badgeClassName="bg-accent text-accent-foreground"
+                />
+              ))}
+            </div>
           </div>
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {semiSilkSarees.map((saree) => (
-              <ProductCard
-                key={saree.id}
-                product={saree}
-                badge="SEMI SILK"
-                badgeClassName="bg-accent text-accent-foreground"
-              />
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Cotton Sarees Section */}
-      <section className="bg-background px-6 py-16 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-10 flex items-center justify-between">
-            <div>
-              <h2 className="font-serif text-2xl text-foreground md:text-3xl">
-                Handloom Cotton Sarees
-              </h2>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Soft, breathable cottons for everyday elegance
-              </p>
+      {cottonSarees.length > 0 && (
+        <section className="bg-background px-6 py-16 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-10 flex items-center justify-between">
+              <div>
+                <h2 className="font-serif text-2xl text-foreground md:text-3xl">
+                  Handloom Cotton Sarees
+                </h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Soft, breathable cottons for everyday elegance
+                </p>
+              </div>
+              <Link
+                href="/handloom-cotton"
+                className="text-sm text-accent hover:underline"
+              >
+                View All Cotton
+              </Link>
             </div>
-            <Link
-              href="/handloom-cotton"
-              className="text-sm text-accent hover:underline"
-            >
-              View All Cotton
-            </Link>
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {cottonSarees.map((saree: any) => (
+                <ProductCard
+                  key={saree.id}
+                  product={{
+                    id: saree.id,
+                    name: saree.name,
+                    description: saree.description,
+                    image: saree.image,
+                    price: `£${(saree.price_in_cents / 100).toFixed(2)}`,
+                    priceInCents: saree.price_in_cents,
+                    category: 'handloom-cotton',
+                    categoryLabel: 'Handloom Cotton',
+                  }}
+                  stock={saree.stock}
+                  badge="COTTON"
+                  badgeClassName="bg-secondary text-secondary-foreground"
+                />
+              ))}
+            </div>
           </div>
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {cottonSarees.map((saree) => (
-              <ProductCard
-                key={saree.id}
-                product={saree}
-                badge="COTTON"
-                badgeClassName="bg-secondary text-secondary-foreground"
-              />
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <Footer />
     </main>
   )
 }
+
