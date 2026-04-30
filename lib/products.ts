@@ -133,8 +133,8 @@ export const products: Product[] = [
   {
     id: "semi-silk-coral-blue",
     name: "Semi Silk - Coral Blue",
-    price: "£28",
-    priceInCents: 2800,
+    price: "£31",
+    priceInCents: 3100,
     image: "/images/semi-silk-3.jpg",
     description:
       "Stunning coral semi-silk saree with a vibrant blue and gold zari border adorned with traditional elephant and floral motifs. A statement piece for weddings and festivities.",
