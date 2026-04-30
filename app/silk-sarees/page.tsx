@@ -131,11 +131,6 @@ export default async function SilkSareesPage() {
                         OUT OF STOCK
                       </span>
                     )}
-                    {product.stock === 1 && (
-                      <div className="absolute right-2 top-2 rounded-md bg-amber-500 px-2 py-1 text-xs font-medium text-white">
-                        Only 1 left
-                      </div>
-                    )}
                   </div>
                   <div className="p-6">
                     <h3 className="font-serif text-xl text-foreground">

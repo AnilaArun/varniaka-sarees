@@ -33,11 +33,6 @@ export function ProductActionsDB({ product }: { product: Product }) {
 
   return (
     <div className="mt-8 space-y-4 border-t border-border pt-8">
-      {product.stock === 1 && (
-        <p className="text-sm font-medium text-amber-600">
-          Only 1 left in stock - order soon!
-        </p>
-      )}
       {isOutOfStock ? (
         <button
           disabled

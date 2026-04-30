@@ -128,11 +128,6 @@ export default async function ProductDetailPage({
                   OUT OF STOCK
                 </span>
               )}
-              {product.stock === 1 && (
-                <span className="absolute left-3 top-3 bg-amber-500 px-3 py-1 text-[10px] tracking-wider text-white">
-                  ONLY 1 LEFT
-                </span>
-              )}
             </div>
 
             {/* Product Info */}
