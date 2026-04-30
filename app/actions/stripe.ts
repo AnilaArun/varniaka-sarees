@@ -149,3 +149,35 @@ export async function getCheckoutSession(sessionId: string) {
     customerEmail: session.customer_details?.email,
   }
 }
+
+export async function reduceStockAfterPurchase(cartItems: CartItem[]) {
+  const supabase = await createClient()
+  
+  for (const item of cartItems) {
+    // Get current stock
+    const { data: product, error: getError } = await supabase
+      .from('products')
+      .select('stock, name')
+      .eq('id', item.id)
+      .single()
+    
+    if (getError || !product) {
+      console.error(`Failed to get product ${item.id}:`, getError)
+      continue
+    }
+    
+    // Reduce stock
+    const newStock = Math.max(0, product.stock - item.quantity)
+    
+    const { error: updateError } = await supabase
+      .from('products')
+      .update({ stock: newStock })
+      .eq('id', item.id)
+    
+    if (updateError) {
+      console.error(`Failed to update stock for ${item.id}:`, updateError)
+    } else {
+      console.log(`Reduced stock for "${product.name}": ${product.stock} -> ${newStock}`)
+    }
+  }
+}
