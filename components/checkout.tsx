@@ -8,7 +8,7 @@ import {
 import { loadStripe } from '@stripe/stripe-js'
 import { Loader2 } from 'lucide-react'
 
-import { startCheckoutSession, type CartItem } from '@/app/actions/stripe'
+import { startCheckoutSession, reduceStockAfterPurchase, type CartItem } from '@/app/actions/stripe'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
@@ -19,6 +19,14 @@ interface CheckoutProps {
 
 export default function Checkout({ cartItems, onComplete }: CheckoutProps) {
   const [error, setError] = useState<string | null>(null)
+
+  // Handle checkout completion - reduce stock and notify parent
+  const handleComplete = useCallback(async () => {
+    // Reduce stock in database
+    await reduceStockAfterPurchase(cartItems)
+    // Call parent onComplete callback
+    onComplete?.()
+  }, [cartItems, onComplete])
 
   const fetchClientSecret = useCallback(async () => {
     try {
@@ -53,7 +61,7 @@ export default function Checkout({ cartItems, onComplete }: CheckoutProps) {
         stripe={stripePromise}
         options={{
           fetchClientSecret,
-          onComplete,
+          onComplete: handleComplete,
         }}
       >
         <EmbeddedCheckout />
