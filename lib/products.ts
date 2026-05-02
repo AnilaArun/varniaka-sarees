@@ -97,8 +97,8 @@ export const products: Product[] = [
   {
     id: "semi-silk-mauve-green",
     name: "Semi Silk - Mauve Green",
-    price: "£35",
-    priceInCents: 3500,
+    price: "£33.50",
+    priceInCents: 3350,
     image: "/images/semi-silk-1.jpg",
     description:
       "Elegant mauve semi-silk saree with a stunning green and gold zari border featuring intricate geometric patterns. Perfect blend of tradition and contemporary style for festive occasions.",
