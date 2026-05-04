@@ -10,11 +10,6 @@ interface Collection {
   name: string
 }
 
-interface ProductDetail {
-  label: string
-  value: string
-}
-
 interface ProductFormProps {
   collections: Collection[]
   initialData?: {
@@ -32,7 +27,6 @@ interface ProductFormProps {
     blouse: string | null
     care: string | null
     stock: number | null
-    product_details?: ProductDetail[]
   }
 }
 
@@ -59,16 +53,6 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
     care: initialData?.care || "Dry clean recommended",
     stock: initialData?.stock?.toString() || "1",
   })
-
-  const [productDetails, setProductDetails] = useState<ProductDetail[]>(
-    initialData?.product_details && initialData.product_details.length > 0
-      ? initialData.product_details
-      : [
-          { label: "Saree", value: "" },
-          { label: "Pallu", value: "" },
-          { label: "Blouse", value: "Running blouse piece included" },
-        ]
-  )
 
   // Auto-fill fabric when collection changes
   useEffect(() => {
@@ -133,9 +117,6 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
     try {
       const priceInCents = Math.round(parseFloat(formData.price) * 100)
 
-      // Filter out empty product details
-      const filteredDetails = productDetails.filter(d => d.label.trim() && d.value.trim())
-
       const productData = {
         name: formData.name,
         slug: formData.slug,
@@ -150,7 +131,6 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
         blouse: formData.blouse || null,
         care: formData.care || null,
         stock: parseInt(formData.stock) || 0,
-        product_details: filteredDetails,
       }
 
       if (initialData?.id) {
@@ -444,68 +424,6 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
             placeholder="e.g., Dry clean recommended"
           />
         </div>
-      </div>
-
-      {/* Additional Product Details - Dynamic Array */}
-      <div className="space-y-4 border-t pt-6">
-        <div className="flex items-center justify-between">
-          <h3 className="font-medium">Additional Details (Saree, Pallu, Blouse, etc.)</h3>
-          <button
-            type="button"
-            onClick={() => setProductDetails([...productDetails, { label: "", value: "" }])}
-            className="flex items-center gap-1 rounded-md border px-3 py-1.5 text-sm transition-colors hover:bg-muted"
-          >
-            <Plus className="h-4 w-4" />
-            Add Detail
-          </button>
-        </div>
-
-        <div className="space-y-3">
-          {productDetails.map((detail, index) => (
-            <div key={index} className="flex gap-3 items-start">
-              <div className="w-1/3">
-                <input
-                  type="text"
-                  value={detail.label}
-                  onChange={(e) => {
-                    const updated = [...productDetails]
-                    updated[index].label = e.target.value
-                    setProductDetails(updated)
-                  }}
-                  className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                  placeholder="Label (e.g., Saree)"
-                />
-              </div>
-              <div className="flex-1">
-                <input
-                  type="text"
-                  value={detail.value}
-                  onChange={(e) => {
-                    const updated = [...productDetails]
-                    updated[index].value = e.target.value
-                    setProductDetails(updated)
-                  }}
-                  className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                  placeholder="Value (e.g., Soft texture with zari work)"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  const updated = productDetails.filter((_, i) => i !== index)
-                  setProductDetails(updated)
-                }}
-                className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </div>
-          ))}
-        </div>
-
-        <p className="text-xs text-muted-foreground">
-          Add details for Saree body, Pallu design, Blouse piece, Border style, etc.
-        </p>
       </div>
 
       <div className="flex gap-4 border-t pt-6">

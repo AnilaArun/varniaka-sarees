@@ -6,11 +6,6 @@ import { Footer } from "@/components/footer"
 import { createClient } from "@/lib/supabase/server"
 import { ProductActionsDB } from "@/components/product-actions-db"
 
-interface ProductDetail {
-  label: string
-  value: string
-}
-
 interface Product {
   id: string
   name: string
@@ -26,7 +21,6 @@ interface Product {
   blouse: string | null
   care: string | null
   is_active: boolean
-  product_details?: ProductDetail[]
   collection?: {
     id: string
     name: string
@@ -214,27 +208,6 @@ export default async function ProductDetailPage({
                         </dd>
                       </div>
                     )}
-                  </dl>
-                </div>
-              )}
-
-              {/* Additional Product Details (Saree, Pallu, Blouse, etc.) */}
-              {product.product_details && product.product_details.length > 0 && (
-                <div className="mt-8 space-y-4 border-t border-border pt-8">
-                  <h2 className="font-serif text-lg text-foreground">
-                    Additional Details
-                  </h2>
-                  <dl className="space-y-3 text-sm">
-                    {product.product_details.map((detail, index) => (
-                      <div key={index} className="flex">
-                        <dt className="w-24 flex-shrink-0 font-medium text-foreground">
-                          {detail.label}
-                        </dt>
-                        <dd className="text-muted-foreground">
-                          {detail.value}
-                        </dd>
-                      </div>
-                    ))}
                   </dl>
                 </div>
               )}
