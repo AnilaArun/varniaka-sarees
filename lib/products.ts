@@ -5,7 +5,7 @@ export interface Product {
   priceInCents: number
   image: string
   description: string
-  category: "silk" | "handloom-cotton" | "semi-silk" | "kalyani-cotton"
+  category: "silk" | "semi-silk" | "kalyani-cotton"
   categoryLabel: string
   details?: {
     fabric?: string

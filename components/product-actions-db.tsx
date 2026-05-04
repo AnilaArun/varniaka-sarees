@@ -1,8 +1,6 @@
 "use client"
 
-import { ShoppingBag, Check } from "lucide-react"
-import { useCart } from "@/lib/cart-context"
-import { useState } from "react"
+import { MessageCircle } from "lucide-react"
 
 interface Product {
   id: string
@@ -13,23 +11,20 @@ interface Product {
   stock: number
 }
 
+const WHATSAPP_NUMBER = "447721943635"
+
 export function ProductActionsDB({ product }: { product: Product }) {
-  const { addItem } = useCart()
-  const [added, setAdded] = useState(false)
-
-  const handleAddToCart = () => {
-    addItem({
-      id: product.id,
-      name: product.name,
-      price: `£${product.price.toFixed(2)}`,
-      priceInCents: product.price_in_cents,
-      image: product.image_url,
-    })
-    setAdded(true)
-    setTimeout(() => setAdded(false), 2000)
-  }
-
   const isOutOfStock = product.stock === 0
+
+  const handleWhatsAppOrder = () => {
+    const message = encodeURIComponent(
+      `Hi, I'm interested in ordering:\n\n` +
+      `*${product.name}*\n` +
+      `Price: £${product.price.toFixed(2)}\n\n` +
+      `Please let me know the availability and next steps. Thank you!`
+    )
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank')
+  }
 
   return (
     <div className="mt-8 space-y-4 border-t border-border pt-8">
@@ -47,20 +42,11 @@ export function ProductActionsDB({ product }: { product: Product }) {
         </button>
       ) : (
         <button
-          onClick={handleAddToCart}
-          className="flex w-full items-center justify-center gap-2 rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          onClick={handleWhatsAppOrder}
+          className="flex w-full items-center justify-center gap-2 rounded-md bg-[#25D366] px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-[#128C7E]"
         >
-          {added ? (
-            <>
-              <Check className="h-4 w-4" />
-              Added to Cart
-            </>
-          ) : (
-            <>
-              <ShoppingBag className="h-4 w-4" />
-              Add to Cart
-            </>
-          )}
+          <MessageCircle className="h-4 w-4" />
+          Order via WhatsApp
         </button>
       )}
     </div>
