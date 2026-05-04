@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { Camera, Upload, X, Loader2 } from "lucide-react"
+import { Camera, Upload, X, Loader2, Plus, Trash2 } from "lucide-react"
 
 interface Collection {
   id: string
@@ -43,16 +43,26 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
     name: initialData?.name || "",
     slug: initialData?.slug || "",
     price: initialData?.price?.toString() || "",
-    description: initialData?.description || "",
+    description: initialData?.description || "Elegant handcrafted saree with traditional designs and premium quality fabric.",
     image_url: initialData?.image_url || "",
     collection_id: initialData?.collection_id || "",
     fabric: initialData?.fabric || "",
-    length: initialData?.length || "",
-    width: initialData?.width || "",
-    blouse: initialData?.blouse || "",
-    care: initialData?.care || "",
+    length: initialData?.length || "5.5 meters",
+    width: initialData?.width || "1.1 meters",
+    blouse: initialData?.blouse || "Running blouse piece included (unstitched)",
+    care: initialData?.care || "Dry clean recommended",
     stock: initialData?.stock?.toString() || "1",
   })
+
+  // Auto-fill fabric when collection changes
+  useEffect(() => {
+    if (formData.collection_id && !initialData?.fabric) {
+      const selectedCollection = collections.find(c => c.id === formData.collection_id)
+      if (selectedCollection) {
+        setFormData(prev => ({ ...prev, fabric: selectedCollection.name }))
+      }
+    }
+  }, [formData.collection_id, collections, initialData?.fabric])
 
   const generateSlug = (name: string) => {
     return name
@@ -267,21 +277,22 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
             <label htmlFor="stock" className="block text-sm font-medium">
               Stock Quantity *
             </label>
-            <input
+            <select
               id="stock"
-              type="number"
-              min="0"
               required
               value={formData.stock}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, stock: e.target.value }))
               }
               className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-              placeholder="1"
-            />
-            <p className="mt-1 text-xs text-muted-foreground">
-              Set to 0 to mark as out of stock
-            </p>
+            >
+              <option value="0">0 - Out of Stock</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
           </div>
         </div>
 
@@ -327,7 +338,7 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
 
       {/* Product Details */}
       <div className="space-y-4 border-t pt-6">
-        <h3 className="font-medium">Product Details (Optional)</h3>
+        <h3 className="font-medium">Product Specifications</h3>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
@@ -342,8 +353,11 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
                 setFormData((prev) => ({ ...prev, fabric: e.target.value }))
               }
               className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-              placeholder="e.g., Pure Kanchipuram Silk"
+              placeholder="Auto-filled from collection"
             />
+            <p className="mt-1 text-xs text-muted-foreground">
+              Auto-fills when you select a collection
+            </p>
           </div>
 
           <div>
@@ -358,7 +372,7 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
                 setFormData((prev) => ({ ...prev, length: e.target.value }))
               }
               className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-              placeholder="e.g., 6.3 meters"
+              placeholder="e.g., 5.5 meters"
             />
           </div>
 
@@ -374,7 +388,7 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
                 setFormData((prev) => ({ ...prev, width: e.target.value }))
               }
               className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-              placeholder="e.g., 47 inches"
+              placeholder="e.g., 1.1 meters"
             />
           </div>
 
@@ -390,7 +404,7 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
                 setFormData((prev) => ({ ...prev, blouse: e.target.value }))
               }
               className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-              placeholder="e.g., 0.8 meters (unstitched)"
+              placeholder="e.g., Running blouse piece included"
             />
           </div>
         </div>
@@ -407,7 +421,7 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
               setFormData((prev) => ({ ...prev, care: e.target.value }))
             }
             className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-            placeholder="e.g., Dry clean only"
+            placeholder="e.g., Dry clean recommended"
           />
         </div>
       </div>
