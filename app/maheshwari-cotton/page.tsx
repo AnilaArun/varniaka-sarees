@@ -49,12 +49,12 @@ export default async function HandloomCottonPage() {
             COLLECTION
           </span>
           <h1 className="mt-4 font-serif text-4xl text-primary-foreground md:text-5xl lg:text-6xl">
-            Handloom Cotton
+            Maheshwari Cotton
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-primary-foreground/80 lg:text-lg">
-            Discover our exquisite collection of handloom cotton sarees.
-            Handcrafted with traditional techniques, each piece celebrates the
-            timeless beauty of Indian handloom weaving.
+            Discover our exquisite collection of Maheshwari cotton sarees.
+            Handcrafted in Maheshwar, Madhya Pradesh, each piece features the signature
+            reversible borders and delicate star motifs that define this heritage weave.
           </p>
         </div>
       </section>

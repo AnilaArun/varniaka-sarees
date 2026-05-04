@@ -5,7 +5,7 @@ import { NewsletterForm } from "@/components/newsletter-form"
 const footerLinks = {
   collections: [
     { label: "Silk Sarees", href: "#" },
-    { label: "Handloom Cotton", href: "#" },
+    { label: "Maheshwari Cotton", href: "/maheshwari-cotton" },
     { label: "Semi Silk", href: "#" },
   ],
   company: [

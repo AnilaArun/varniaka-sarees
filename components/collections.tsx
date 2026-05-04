@@ -10,11 +10,11 @@ const collections = [
     href: "/silk-sarees",
   },
   {
-    title: "Handloom Cotton",
-    description: "Breathable handwoven cotton sarees with traditional block prints",
-    image: "/images/cotton-saree.png",
+    title: "Maheshwari Cotton",
+    description: "Traditional Maheshwari sarees with signature zari borders and star motifs",
+    image: "/images/maheshwari-cotton-saree.jpg",
     count: "36 Pieces",
-    href: "/handloom-cotton",
+    href: "/maheshwari-cotton",
   },
   {
     title: "Semi Silk",
