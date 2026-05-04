@@ -144,7 +144,7 @@ export default async function ProductDetailPage({
                 {product.name}
               </h1>
               <p className="mt-4 text-2xl font-semibold text-accent">
-                £{product.price.toFixed(2)}
+                £{parseFloat(product.price).toFixed(2)}
               </p>
 
               <p className="mt-6 leading-relaxed text-muted-foreground">
@@ -250,7 +250,7 @@ export default async function ProductDetailPage({
                     <h3 className="font-serif text-lg text-foreground">
                       {relatedProduct.name}
                     </h3>
-                    <p className="mt-1 text-accent">£{relatedProduct.price.toFixed(2)}</p>
+                    <p className="mt-1 text-accent">£{parseFloat(String(relatedProduct.price)).toFixed(2)}</p>
                   </div>
                 </Link>
               ))}
