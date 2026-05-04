@@ -20,10 +20,17 @@ interface Product {
 export default async function OrganzaPage() {
   const supabase = await createClient()
   
+  // First get the organza collection ID
+  const { data: collection } = await supabase
+    .from('collections')
+    .select('id')
+    .eq('slug', 'organza')
+    .single()
+  
   const { data: dbProducts } = await supabase
     .from('products')
     .select('id, name, price, image_url, stock')
-    .eq('collection', 'organza')
+    .eq('collection_id', collection?.id || '')
     .order('created_at', { ascending: false })
 
   const products: Product[] = dbProducts || []
