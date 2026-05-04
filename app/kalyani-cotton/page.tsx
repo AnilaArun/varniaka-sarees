@@ -7,13 +7,14 @@ import { getProductsByCategory } from "@/lib/products"
 import { createClient } from "@/lib/supabase/server"
 import { ProductCard } from "@/components/product-card"
 
+// Static products from original data
+const staticProducts = getProductsByCategory("kalyani-cotton")
 
-
-export default async function MaheshwariCottonPage() {
+export default async function KalyaniCottonPage() {
   // Fetch products from database
   const supabase = await createClient()
   
-  // Get all cotton-related products from database
+  // Get all Kalyani cotton products from database
   const { data: dbProducts } = await supabase
     .from("products")
     .select(`
@@ -23,14 +24,11 @@ export default async function MaheshwariCottonPage() {
     .eq("is_active", true)
     .order("created_at", { ascending: false })
 
-  // Filter to only Maheshwari cotton products
-  const maheshwariProducts = (dbProducts || []).filter((p: any) => 
-    p.collections?.slug === 'maheshwari-cotton' ||
-    p.collections?.slug === 'maheswari-cotton' ||
-    p.collections?.name?.toLowerCase().includes('maheshwari') ||
-    p.collections?.name?.toLowerCase().includes('maheswari') ||
-    p.name?.toLowerCase().includes('maheshwari') ||
-    p.name?.toLowerCase().includes('maheswari')
+  // Filter to only Kalyani cotton products
+  const kalyaniProducts = (dbProducts || []).filter((p: any) => 
+    p.collections?.slug === 'kalyani-cotton' ||
+    p.collections?.name?.toLowerCase().includes('kalyani') ||
+    p.name?.toLowerCase().includes('kalyani')
   )
 
   return (
@@ -51,23 +49,48 @@ export default async function MaheshwariCottonPage() {
             COLLECTION
           </span>
           <h1 className="mt-4 font-serif text-4xl text-primary-foreground md:text-5xl lg:text-6xl">
-            Maheshwari Cotton
+            Kalyani Cotton
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-primary-foreground/80 lg:text-lg">
-            Discover our exquisite collection of Maheshwari cotton sarees.
-            Handcrafted in Maheshwar, Madhya Pradesh, each piece features the signature
-            reversible borders and delicate star motifs that define this heritage weave.
+            Discover our exquisite collection of Kalyani cotton sarees.
+            Soft, lightweight, and breathable, each piece is designed for 
+            everyday elegance with a smooth finish and classic appeal.
           </p>
         </div>
       </section>
 
+      {/* Static Products Section */}
+      {staticProducts.length > 0 && (
+        <section className="px-6 py-16 lg:px-8 lg:py-24">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-12 text-center">
+              <span className="text-xs tracking-[0.4em] text-muted-foreground">
+                KALYANI COTTON
+              </span>
+              <h2 className="mt-4 font-serif text-3xl text-foreground md:text-4xl">
+                Everyday Elegance
+              </h2>
+              <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
+                Soft, lightweight, and breathable Kalyani cotton fabric designed for everyday elegance.
+              </p>
+            </div>
+
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {staticProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Database Products Section */}
-      {maheshwariProducts.length > 0 && (
+      {kalyaniProducts.length > 0 && (
         <section className="border-t px-6 py-16 lg:px-8 lg:py-24">
           <div className="mx-auto max-w-7xl">
             <div className="mb-12 text-center">
               <span className="text-xs tracking-[0.4em] text-muted-foreground">
-                MORE COTTON SAREES
+                MORE KALYANI SAREES
               </span>
               <h2 className="mt-4 font-serif text-3xl text-foreground md:text-4xl">
                 New Arrivals
@@ -75,7 +98,7 @@ export default async function MaheshwariCottonPage() {
             </div>
 
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {maheshwariProducts.map((product: any) => (
+              {kalyaniProducts.map((product: any) => (
                 <article
                   key={product.id}
                   className="group overflow-hidden rounded-lg border border-border bg-card transition-shadow hover:shadow-lg"

@@ -58,6 +58,13 @@ const collections = [
     count: "22 Pieces",
     href: "/organza",
   },
+  {
+    title: "Kalyani Cotton",
+    description: "Soft and breathable Kalyani cotton sarees perfect for everyday elegance",
+    image: "/images/kalyani-cotton-saree.jpg",
+    count: "24 Pieces",
+    href: "/kalyani-cotton",
+  },
 ]
 
 export function Collections() {
