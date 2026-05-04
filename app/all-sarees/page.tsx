@@ -8,7 +8,7 @@ import { ProductCard } from "@/components/product-card"
 export default function AllSareesPage() {
   const silkSarees = products.filter((p) => p.category === "silk")
   const semiSilkSarees = products.filter((p) => p.category === "semi-silk")
-  const cottonSarees = products.filter((p) => p.category === "handloom-cotton")
+  const kalyaniCottonSarees = products.filter((p) => p.category === "kalyani-cotton")
 
   return (
     <main className="min-h-screen bg-background">
@@ -106,25 +106,25 @@ export default function AllSareesPage() {
           <div className="mb-10 flex items-center justify-between">
             <div>
               <h2 className="font-serif text-2xl text-foreground md:text-3xl">
-                Maheshwari Cotton Sarees
+                Kalyani Cotton Sarees
               </h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Traditional Maheshwari sarees with signature zari borders
+                Soft and breathable Kalyani cotton for everyday elegance
               </p>
             </div>
             <Link
-              href="/maheshwari-cotton"
+              href="/kalyani-cotton"
               className="text-sm text-accent hover:underline"
             >
-              View All Maheshwari
+              View All Kalyani
             </Link>
           </div>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {cottonSarees.map((saree) => (
+            {kalyaniCottonSarees.map((saree) => (
               <ProductCard
                 key={saree.id}
                 product={saree}
-                badge="COTTON"
+                badge="KALYANI COTTON"
                 badgeClassName="bg-secondary text-secondary-foreground"
               />
             ))}
