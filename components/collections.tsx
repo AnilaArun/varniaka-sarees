@@ -23,6 +23,34 @@ const collections = [
     count: "24 Pieces",
     href: "/semi-silk",
   },
+  {
+    title: "Banarasi",
+    description: "Exquisite Banarasi sarees with intricate gold and silver zari work",
+    image: "/images/banarasi-saree.jpg",
+    count: "32 Pieces",
+    href: "/banarasi",
+  },
+  {
+    title: "Mul Cotton",
+    description: "Lightweight and breathable Mul Cotton sarees perfect for everyday elegance",
+    image: "/images/mul-cotton-saree.jpg",
+    count: "28 Pieces",
+    href: "/mul-cotton",
+  },
+  {
+    title: "Linen",
+    description: "Premium linen sarees combining comfort with contemporary style",
+    image: "/images/linen-saree.jpg",
+    count: "20 Pieces",
+    href: "/linen",
+  },
+  {
+    title: "Kerala Sarees",
+    description: "Traditional Kerala Kasavu sarees with golden borders and timeless grace",
+    image: "/images/kerala-saree.jpg",
+    count: "18 Pieces",
+    href: "/kerala-sarees",
+  },
 ]
 
 export function Collections() {
