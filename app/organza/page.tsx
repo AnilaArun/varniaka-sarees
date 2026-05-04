@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
-import { createClient } from "@/utils/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
   title: "Organza Sarees | Varnikaakreations",
