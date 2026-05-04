@@ -21,9 +21,9 @@ export default function Checkout({ cartItems, onComplete }: CheckoutProps) {
   const [error, setError] = useState<string | null>(null)
 
   // Handle checkout completion - reduce stock and notify parent
-  const handleComplete = useCallback(async () => {
-    // Reduce stock in database
-    await reduceStockAfterPurchase(cartItems)
+  const handleComplete = useCallback(() => {
+    // Reduce stock in database (fire and forget - don't block the UI)
+    reduceStockAfterPurchase(cartItems).catch(console.error)
     // Call parent onComplete callback
     onComplete?.()
   }, [cartItems, onComplete])
