@@ -51,6 +51,13 @@ const collections = [
     count: "18 Pieces",
     href: "/kerala-sarees",
   },
+  {
+    title: "Organza",
+    description: "Sheer and elegant Organza sarees with delicate embroidery and modern appeal",
+    image: "/images/organza-saree.jpg",
+    count: "22 Pieces",
+    href: "/organza",
+  },
 ]
 
 export function Collections() {
