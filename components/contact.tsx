@@ -62,10 +62,16 @@ export function Contact() {
                   <Phone className="h-5 w-5 text-primary-foreground" />
                 </div>
                 <div>
-                  <h3 className="font-serif text-lg text-foreground">Call Us</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">Coming soon ....</p>
-                  {/* <p className="mt-1 text-sm text-muted-foreground">+91 XXXXX XXXXX</p>
-                  <p className="text-sm text-muted-foreground">Mon - Sat, 10am - 7pm IST</p> */}
+                  <h3 className="font-serif text-lg text-foreground">WhatsApp</h3>
+                  <a 
+                    href="https://wa.me/447721943635" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="mt-1 block text-sm text-muted-foreground hover:text-accent transition-colors"
+                  >
+                    +44 7721 943635
+                  </a>
+                  <p className="text-sm text-muted-foreground">Click to chat with us</p>
                 </div>
               </div>
 

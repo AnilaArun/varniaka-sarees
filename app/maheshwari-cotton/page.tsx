@@ -7,10 +7,9 @@ import { getProductsByCategory } from "@/lib/products"
 import { createClient } from "@/lib/supabase/server"
 import { ProductCard } from "@/components/product-card"
 
-// Static products from original data (Kalyani Cotton)
-const staticProducts = getProductsByCategory("handloom-cotton")
 
-export default async function HandloomCottonPage() {
+
+export default async function MaheshwariCottonPage() {
   // Fetch products from database
   const supabase = await createClient()
   
@@ -24,11 +23,14 @@ export default async function HandloomCottonPage() {
     .eq("is_active", true)
     .order("created_at", { ascending: false })
 
-  // Filter to only cotton-related products
-  const cottonProducts = (dbProducts || []).filter((p: any) => 
-    p.collections?.slug?.toLowerCase().includes('cotton') ||
-    p.collections?.name?.toLowerCase().includes('cotton') ||
-    p.name?.toLowerCase().includes('cotton')
+  // Filter to only Maheshwari cotton products
+  const maheshwariProducts = (dbProducts || []).filter((p: any) => 
+    p.collections?.slug === 'maheshwari-cotton' ||
+    p.collections?.slug === 'maheswari-cotton' ||
+    p.collections?.name?.toLowerCase().includes('maheshwari') ||
+    p.collections?.name?.toLowerCase().includes('maheswari') ||
+    p.name?.toLowerCase().includes('maheshwari') ||
+    p.name?.toLowerCase().includes('maheswari')
   )
 
   return (
@@ -49,43 +51,18 @@ export default async function HandloomCottonPage() {
             COLLECTION
           </span>
           <h1 className="mt-4 font-serif text-4xl text-primary-foreground md:text-5xl lg:text-6xl">
-            Handloom Cotton
+            Maheshwari Cotton
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-primary-foreground/80 lg:text-lg">
-            Discover our exquisite collection of handloom cotton sarees.
-            Handcrafted with traditional techniques, each piece celebrates the
-            timeless beauty of Indian handloom weaving.
+            Discover our exquisite collection of Maheshwari cotton sarees.
+            Handcrafted in Maheshwar, Madhya Pradesh, each piece features the signature
+            reversible borders and delicate star motifs that define this heritage weave.
           </p>
         </div>
       </section>
 
-      {/* Kalyani Cotton Section - Static Products */}
-      {staticProducts.length > 0 && (
-        <section className="px-6 py-16 lg:px-8 lg:py-24">
-          <div className="mx-auto max-w-7xl">
-            <div className="mb-12 text-center">
-              <span className="text-xs tracking-[0.4em] text-muted-foreground">
-                KALYANI COTTON
-              </span>
-              <h2 className="mt-4 font-serif text-3xl text-foreground md:text-4xl">
-                Everyday Elegance
-              </h2>
-              <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
-                Soft, lightweight, and breathable Kalyani cotton fabric designed for everyday elegance.
-              </p>
-            </div>
-
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {staticProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* Database Products Section */}
-      {cottonProducts.length > 0 && (
+      {maheshwariProducts.length > 0 && (
         <section className="border-t px-6 py-16 lg:px-8 lg:py-24">
           <div className="mx-auto max-w-7xl">
             <div className="mb-12 text-center">
@@ -98,7 +75,7 @@ export default async function HandloomCottonPage() {
             </div>
 
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {cottonProducts.map((product: any) => (
+              {maheshwariProducts.map((product: any) => (
                 <article
                   key={product.id}
                   className="group overflow-hidden rounded-lg border border-border bg-card transition-shadow hover:shadow-lg"

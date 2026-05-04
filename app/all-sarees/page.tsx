@@ -106,17 +106,17 @@ export default function AllSareesPage() {
           <div className="mb-10 flex items-center justify-between">
             <div>
               <h2 className="font-serif text-2xl text-foreground md:text-3xl">
-                Handloom Cotton Sarees
+                Maheshwari Cotton Sarees
               </h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Soft, breathable cottons for everyday elegance
+                Traditional Maheshwari sarees with signature zari borders
               </p>
             </div>
             <Link
-              href="/handloom-cotton"
+              href="/maheshwari-cotton"
               className="text-sm text-accent hover:underline"
             >
-              View All Cotton
+              View All Maheshwari
             </Link>
           </div>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

@@ -5,7 +5,7 @@ export interface Product {
   priceInCents: number
   image: string
   description: string
-  category: "silk" | "handloom-cotton" | "semi-silk"
+  category: "silk" | "handloom-cotton" | "semi-silk" | "kalyani-cotton"
   categoryLabel: string
   details?: {
     fabric?: string
@@ -55,7 +55,7 @@ export const products: Product[] = [
     },
   },
 
-  // Handloom Cotton - Kalyani Cotton
+  // Kalyani Cotton
   {
     id: "kalyani-cotton-pink-navy",
     name: "Kalyani Cotton - Pink Navy",
@@ -64,8 +64,8 @@ export const products: Product[] = [
     image: "/images/kalyani-cotton-2.jpg",
     description:
       "Soft, lightweight, and breathable Kalyani cotton fabric designed for everyday elegance. Comfortable to wear with a smooth finish and classic appeal.",
-    category: "handloom-cotton",
-    categoryLabel: "Handloom Cotton",
+    category: "kalyani-cotton",
+    categoryLabel: "Kalyani Cotton",
     details: {
       fabric: "Pure Kalyani Cotton",
       length: "6.3 meters (including blouse piece)",
@@ -82,8 +82,8 @@ export const products: Product[] = [
     image: "/images/kalyani-cotton-3.jpg",
     description:
       "Soft, lightweight, and breathable Kalyani cotton fabric designed for everyday elegance. Comfortable to wear with a smooth finish and classic appeal.",
-    category: "handloom-cotton",
-    categoryLabel: "Handloom Cotton",
+    category: "kalyani-cotton",
+    categoryLabel: "Kalyani Cotton",
     details: {
       fabric: "Pure Kalyani Cotton",
       length: "6.3 meters (including blouse piece)",

@@ -20,18 +20,6 @@ const products = [
     image: "/images/featured-3.jpg",
     tag: null,
   },
-  {
-    name: "Mul Cotton",
-    price: "11,000",
-    image: "/images/mul-cotton.jpg",
-    tag: "Limited Edition",
-  },
-  {
-    name: "Linen",
-    price: "10,500",
-    image: "/images/linen.jpg",
-    tag: "New Arrival",
-  },
 ]
 
 export function Featured() {

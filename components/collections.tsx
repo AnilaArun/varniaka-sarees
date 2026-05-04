@@ -10,11 +10,11 @@ const collections = [
     href: "/silk-sarees",
   },
   {
-    title: "Handloom Cotton",
-    description: "Breathable handwoven cotton sarees with traditional block prints",
-    image: "/images/cotton-saree.png",
+    title: "Maheshwari Cotton",
+    description: "Traditional Maheshwari sarees with signature zari borders and star motifs",
+    image: "/images/maheshwari-cotton-saree.jpg",
     count: "36 Pieces",
-    href: "/handloom-cotton",
+    href: "/maheshwari-cotton",
   },
   {
     title: "Semi Silk",
@@ -50,6 +50,20 @@ const collections = [
     image: "/images/kerala-saree.jpg",
     count: "18 Pieces",
     href: "/kerala-sarees",
+  },
+  {
+    title: "Organza",
+    description: "Sheer and elegant Organza sarees with delicate embroidery and modern appeal",
+    image: "/images/organza-saree.jpg",
+    count: "22 Pieces",
+    href: "/organza",
+  },
+  {
+    title: "Kalyani Cotton",
+    description: "Soft and breathable Kalyani cotton sarees perfect for everyday elegance",
+    image: "/images/kalyani-cotton-saree.jpg",
+    count: "24 Pieces",
+    href: "/kalyani-cotton",
   },
 ]
 
