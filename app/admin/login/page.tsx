@@ -1,8 +1,14 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useMemo } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter, useSearchParams } from "next/navigation"
+
+// Check env vars at module level (these are replaced at build time for NEXT_PUBLIC_ vars)
+const isSupabaseConfigured = Boolean(
+  process.env.NEXT_PUBLIC_SUPABASE_URL && 
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+)
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("")
@@ -12,24 +18,17 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false)
   const [isSignUp, setIsSignUp] = useState(false)
   const [isForgotPassword, setIsForgotPassword] = useState(false)
-  const [supabaseConfigured, setSupabaseConfigured] = useState(true)
   const router = useRouter()
   const searchParams = useSearchParams()
   
-  // Check if Supabase is configured
-  useEffect(() => {
-    const errorParam = searchParams.get('error')
-    if (errorParam === 'supabase_not_configured') {
-      setSupabaseConfigured(false)
-    }
-    // Also check if env vars are present
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      setSupabaseConfigured(false)
-    }
-  }, [searchParams])
+  // Check if Supabase is not configured (from middleware redirect or env vars)
+  const supabaseConfigured = isSupabaseConfigured && searchParams.get('error') !== 'supabase_not_configured'
   
-  // Only create client if configured
-  const supabase = supabaseConfigured ? createClient() : null
+  // Only create client if configured - use useMemo to avoid recreating on every render
+  const supabase = useMemo(() => {
+    if (!supabaseConfigured) return null
+    return createClient()
+  }, [supabaseConfigured])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
