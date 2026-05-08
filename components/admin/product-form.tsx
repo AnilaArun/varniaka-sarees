@@ -71,6 +71,52 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
       .replace(/(^-|-$)/g, "")
   }
 
+  // Compress image before upload for better performance
+  const compressImage = (file: File, maxWidth = 1200, quality = 0.8): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      const img = new window.Image()
+      img.crossOrigin = "anonymous"
+      
+      img.onload = () => {
+        const canvas = document.createElement("canvas")
+        let width = img.width
+        let height = img.height
+
+        // Scale down if larger than maxWidth
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width
+          width = maxWidth
+        }
+
+        canvas.width = width
+        canvas.height = height
+
+        const ctx = canvas.getContext("2d")
+        if (!ctx) {
+          reject(new Error("Could not get canvas context"))
+          return
+        }
+
+        ctx.drawImage(img, 0, 0, width, height)
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(blob)
+            } else {
+              reject(new Error("Failed to compress image"))
+            }
+          },
+          "image/jpeg",
+          quality
+        )
+      }
+
+      img.onerror = () => reject(new Error("Failed to load image"))
+      img.src = URL.createObjectURL(file)
+    })
+  }
+
   const handleNameChange = (name: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -79,21 +125,40 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
     }))
   }
 
+  const [uploadProgress, setUploadProgress] = useState(0)
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
     setUploading(true)
+    setUploadProgress(10)
     setError(null)
 
     try {
+      // Compress image first (much faster upload)
+      setUploadProgress(20)
+      const compressedBlob = await compressImage(file, 1200, 0.85)
+      setUploadProgress(50)
+      
+      // Create a new file from the compressed blob
+      const compressedFile = new File(
+        [compressedBlob], 
+        file.name.replace(/\.[^/.]+$/, ".jpg"), 
+        { type: "image/jpeg" }
+      )
+
       const formDataUpload = new FormData()
-      formDataUpload.append("file", file)
+      formDataUpload.append("file", compressedFile)
+
+      setUploadProgress(60)
 
       const response = await fetch("/api/upload", {
         method: "POST",
         body: formDataUpload,
       })
+
+      setUploadProgress(90)
 
       if (!response.ok) {
         const data = await response.json()
@@ -102,10 +167,12 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
 
       const { url } = await response.json()
       setFormData((prev) => ({ ...prev, image_url: url }))
+      setUploadProgress(100)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed")
     } finally {
       setUploading(false)
+      setUploadProgress(0)
     }
   }
 
@@ -184,11 +251,28 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
             </div>
           ) : (
             <div
-              onClick={() => fileInputRef.current?.click()}
-              className="flex aspect-square w-full max-w-xs cursor-pointer flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed border-muted-foreground/25 bg-muted/50 transition-colors hover:border-primary/50 hover:bg-muted"
+              onClick={() => !uploading && fileInputRef.current?.click()}
+              className={`flex aspect-square w-full max-w-xs flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed bg-muted/50 transition-colors ${
+                uploading 
+                  ? "border-primary/50 cursor-wait" 
+                  : "border-muted-foreground/25 cursor-pointer hover:border-primary/50 hover:bg-muted"
+              }`}
             >
               {uploading ? (
-                <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />
+                <div className="flex flex-col items-center gap-3">
+                  <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                  <div className="w-32">
+                    <div className="h-2 w-full rounded-full bg-muted">
+                      <div 
+                        className="h-2 rounded-full bg-primary transition-all duration-300"
+                        style={{ width: `${uploadProgress}%` }}
+                      />
+                    </div>
+                    <p className="mt-2 text-center text-xs text-muted-foreground">
+                      {uploadProgress < 50 ? "Compressing..." : "Uploading..."}
+                    </p>
+                  </div>
+                </div>
               ) : (
                 <>
                   <Camera className="h-12 w-12 text-muted-foreground" />
