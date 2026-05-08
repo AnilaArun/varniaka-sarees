@@ -1,14 +1,25 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Menu, X } from "lucide-react"
+import { Menu, X, ChevronDown, Search } from "lucide-react"
 import { CartButton } from "@/components/cart-button"
+
+const collections = [
+  { href: "/silk-sarees", label: "Silk Sarees" },
+  { href: "/semi-silk", label: "Semi Silk" },
+  { href: "/banarasi", label: "Banarasi" },
+  { href: "/maheshwari-cotton", label: "Maheshwari Cotton" },
+  { href: "/kalyani-cotton", label: "Kalyani Cotton" },
+  { href: "/mul-cotton", label: "Mul Cotton" },
+  { href: "/linen", label: "Linen" },
+  { href: "/organza", label: "Organza" },
+  { href: "/kerala-sarees", label: "Kerala Sarees" },
+]
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/#collections", label: "Collections" },
   { href: "/#lookbook", label: "Lookbook" },
   { href: "/#story", label: "Our Story" },
   { href: "/#contact", label: "Contact" },
@@ -16,6 +27,31 @@ const navLinks = [
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [collectionsOpen, setCollectionsOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const searchRef = useRef<HTMLDivElement>(null)
+
+  // Filter collections based on search
+  const filteredCollections = collections.filter((c) =>
+    c.label.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setCollectionsOpen(false)
+      }
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setSearchOpen(false)
+        setSearchQuery("")
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   return (
     <header className="sticky top-0 z-50 bg-primary text-primary-foreground">
@@ -40,8 +76,41 @@ export function Navbar() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden items-center gap-10 md:flex">
-          {navLinks.map((link) => (
+        <nav className="hidden items-center gap-8 md:flex">
+          <Link
+            href="/"
+            className="text-sm tracking-wider text-primary-foreground/90 transition-colors hover:text-accent"
+          >
+            Home
+          </Link>
+
+          {/* Collections Dropdown */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setCollectionsOpen(!collectionsOpen)}
+              className="flex items-center gap-1 text-sm tracking-wider text-primary-foreground/90 transition-colors hover:text-accent"
+            >
+              Collections
+              <ChevronDown className={`h-4 w-4 transition-transform ${collectionsOpen ? "rotate-180" : ""}`} />
+            </button>
+
+            {collectionsOpen && (
+              <div className="absolute left-0 top-full mt-2 w-56 rounded-md border border-border bg-background py-2 shadow-lg">
+                {collections.map((collection) => (
+                  <Link
+                    key={collection.href}
+                    href={collection.href}
+                    onClick={() => setCollectionsOpen(false)}
+                    className="block px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted hover:text-accent"
+                  >
+                    {collection.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {navLinks.slice(1).map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -54,6 +123,56 @@ export function Navbar() {
 
         {/* Desktop Icons */}
         <div className="hidden items-center gap-4 md:flex">
+          {/* Search */}
+          <div className="relative" ref={searchRef}>
+            <button
+              onClick={() => setSearchOpen(!searchOpen)}
+              className="text-primary-foreground/90 transition-colors hover:text-accent"
+              aria-label="Search"
+            >
+              <Search className="h-5 w-5" />
+            </button>
+
+            {searchOpen && (
+              <div className="absolute right-0 top-full mt-2 w-72 rounded-md border border-border bg-background p-3 shadow-lg">
+                <input
+                  type="text"
+                  placeholder="Search collections or product code..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none"
+                  autoFocus
+                />
+                {searchQuery && (
+                  <div className="mt-2 max-h-64 overflow-y-auto">
+                    {filteredCollections.length > 0 ? (
+                      <>
+                        <p className="px-2 py-1 text-xs font-medium text-muted-foreground">Collections</p>
+                        {filteredCollections.map((collection) => (
+                          <Link
+                            key={collection.href}
+                            href={collection.href}
+                            onClick={() => {
+                              setSearchOpen(false)
+                              setSearchQuery("")
+                            }}
+                            className="block rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                          >
+                            {collection.label}
+                          </Link>
+                        ))}
+                      </>
+                    ) : (
+                      <p className="px-2 py-2 text-sm text-muted-foreground">
+                        No collections found. Try searching by product code.
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
           <CartButton />
         </div>
 
@@ -70,7 +189,46 @@ export function Navbar() {
       {/* Mobile Nav */}
       {isOpen && (
         <nav className="border-t border-primary-foreground/10 px-6 pb-6 md:hidden">
-          {navLinks.map((link) => (
+          <Link
+            href="/"
+            onClick={() => setIsOpen(false)}
+            className="block py-3 text-sm tracking-wider text-primary-foreground/90 transition-colors hover:text-accent"
+          >
+            Home
+          </Link>
+
+          {/* Mobile Search */}
+          <div className="py-3">
+            <input
+              type="text"
+              placeholder="Search collections..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full rounded-md border border-primary-foreground/20 bg-primary-foreground/10 px-3 py-2 text-sm text-primary-foreground placeholder:text-primary-foreground/50 focus:border-accent focus:outline-none"
+            />
+          </div>
+
+          {/* Mobile Collections */}
+          <div className="py-2">
+            <p className="py-2 text-xs font-medium tracking-wider text-primary-foreground/60">
+              COLLECTIONS
+            </p>
+            {(searchQuery ? filteredCollections : collections).map((collection) => (
+              <Link
+                key={collection.href}
+                href={collection.href}
+                onClick={() => {
+                  setIsOpen(false)
+                  setSearchQuery("")
+                }}
+                className="block py-2 pl-2 text-sm tracking-wider text-primary-foreground/90 transition-colors hover:text-accent"
+              >
+                {collection.label}
+              </Link>
+            ))}
+          </div>
+
+          {navLinks.slice(1).map((link) => (
             <Link
               key={link.href}
               href={link.href}
