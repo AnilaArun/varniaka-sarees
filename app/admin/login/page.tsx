@@ -112,8 +112,8 @@ export default function AdminLoginPage() {
             <p className="mt-1">To use the admin panel, you need to add your Supabase credentials:</p>
             <ol className="mt-2 list-decimal list-inside space-y-1">
               <li>Click the <strong>Settings</strong> button (top right)</li>
-              <li>Go to <strong>Vars</strong> section</li>
-              <li>Add these environment variables:
+              <li>Go to <strong>Environment variables</strong> section</li>
+              <li>Add these variables:
                 <ul className="ml-5 mt-1 list-disc">
                   <li><code className="bg-amber-200 px-1 rounded">NEXT_PUBLIC_SUPABASE_URL</code></li>
                   <li><code className="bg-amber-200 px-1 rounded">NEXT_PUBLIC_SUPABASE_ANON_KEY</code></li>
