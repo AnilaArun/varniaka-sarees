@@ -6,11 +6,12 @@ export async function updateSession(request: NextRequest) {
     request,
   })
 
-  // Only run auth checks for admin routes to avoid rate limiting on public pages
+  // Only run auth checks for admin routes and protected API routes to avoid rate limiting on public pages
   const isAdminRoute = request.nextUrl.pathname.startsWith('/admin')
+  const isProtectedApiRoute = request.nextUrl.pathname.startsWith('/api/upload')
   
-  if (!isAdminRoute) {
-    // For non-admin routes, just pass through without auth check
+  if (!isAdminRoute && !isProtectedApiRoute) {
+    // For non-admin and non-protected API routes, just pass through without auth check
     return supabaseResponse
   }
 
@@ -57,7 +58,8 @@ export async function updateSession(request: NextRequest) {
     // if the user is not logged in and the admin path is accessed (except login/reset), redirect to the login page
     !isLoginPage &&
     !isResetPasswordPage &&
-    !user
+    !user &&
+    !isProtectedApiRoute // Don't redirect API routes - let them handle their own 401 response
   ) {
     // no user, redirect to the admin login page
     const url = request.nextUrl.clone()
