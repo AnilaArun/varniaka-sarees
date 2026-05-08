@@ -15,14 +15,21 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse
   }
 
+  // Allow access to the login and reset-password pages without full auth check
+  const isLoginPage = request.nextUrl.pathname === '/admin/login'
+  const isResetPasswordPage = request.nextUrl.pathname === '/admin/reset-password'
+
   // Check if Supabase environment variables are configured
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   
   if (!supabaseUrl || !supabaseAnonKey) {
-    // Supabase not configured - redirect admin routes to a setup message or just pass through
+    // Supabase not configured - let login page handle showing the error
+    if (isLoginPage || isResetPasswordPage) {
+      return supabaseResponse
+    }
+    // For other admin routes without Supabase config, redirect to login page
     if (isAdminRoute) {
-      // For admin routes without Supabase config, redirect to login page which will show the error
       const url = request.nextUrl.clone()
       url.pathname = '/admin/login'
       url.searchParams.set('error', 'supabase_not_configured')
@@ -67,10 +74,6 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Allow access to the login and reset-password pages without authentication
-  const isLoginPage = request.nextUrl.pathname === '/admin/login'
-  const isResetPasswordPage = request.nextUrl.pathname === '/admin/reset-password'
-  
   if (
     // if the user is not logged in and the admin path is accessed (except login/reset), redirect to the login page
     !isLoginPage &&
