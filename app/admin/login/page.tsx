@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("")
@@ -12,14 +12,36 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false)
   const [isSignUp, setIsSignUp] = useState(false)
   const [isForgotPassword, setIsForgotPassword] = useState(false)
+  const [supabaseConfigured, setSupabaseConfigured] = useState(true)
   const router = useRouter()
-  const supabase = createClient()
+  const searchParams = useSearchParams()
+  
+  // Check if Supabase is configured
+  useEffect(() => {
+    const errorParam = searchParams.get('error')
+    if (errorParam === 'supabase_not_configured') {
+      setSupabaseConfigured(false)
+    }
+    // Also check if env vars are present
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      setSupabaseConfigured(false)
+    }
+  }, [searchParams])
+  
+  // Only create client if configured
+  const supabase = supabaseConfigured ? createClient() : null
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
     setSuccess(null)
     setLoading(true)
+
+    if (!supabase) {
+      setError("Supabase is not configured. Please add your Supabase credentials.")
+      setLoading(false)
+      return
+    }
 
     try {
       if (isForgotPassword) {
@@ -84,6 +106,34 @@ export default function AdminLoginPage() {
                 : "Sign in to manage your Varniaka store"}
           </p>
         </div>
+
+        {!supabaseConfigured && (
+          <div className="rounded-md bg-amber-100 border border-amber-300 p-4 text-sm text-amber-800">
+            <p className="font-medium">Supabase Not Configured</p>
+            <p className="mt-1">To use the admin panel, you need to add your Supabase credentials:</p>
+            <ol className="mt-2 list-decimal list-inside space-y-1">
+              <li>Click the <strong>Settings</strong> button (top right)</li>
+              <li>Go to <strong>Vars</strong> section</li>
+              <li>Add these environment variables:
+                <ul className="ml-5 mt-1 list-disc">
+                  <li><code className="bg-amber-200 px-1 rounded">NEXT_PUBLIC_SUPABASE_URL</code></li>
+                  <li><code className="bg-amber-200 px-1 rounded">NEXT_PUBLIC_SUPABASE_ANON_KEY</code></li>
+                </ul>
+              </li>
+            </ol>
+            <p className="mt-2">
+              Find these values in your{" "}
+              <a 
+                href="https://supabase.com/dashboard/project/_/settings/api" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="underline font-medium"
+              >
+                Supabase Dashboard
+              </a>
+            </p>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           {error && (

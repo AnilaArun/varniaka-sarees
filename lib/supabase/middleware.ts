@@ -15,6 +15,23 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse
   }
 
+  // Check if Supabase environment variables are configured
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  
+  if (!supabaseUrl || !supabaseAnonKey) {
+    // Supabase not configured - redirect admin routes to a setup message or just pass through
+    if (isAdminRoute) {
+      // For admin routes without Supabase config, redirect to login page which will show the error
+      const url = request.nextUrl.clone()
+      url.pathname = '/admin/login'
+      url.searchParams.set('error', 'supabase_not_configured')
+      return NextResponse.redirect(url)
+    }
+    // For API routes, just pass through and let them handle the error
+    return supabaseResponse
+  }
+
   // With Fluid compute, don't put this client in a global environment
   // variable. Always create a new one on each request.
   const supabase = createServerClient(
