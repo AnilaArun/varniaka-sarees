@@ -4,6 +4,7 @@ import { Playfair_Display, Lato } from "next/font/google"
 import "./globals.css"
 import { CartProvider } from "@/lib/cart-context"
 import { CartSidebar } from "@/components/cart-sidebar"
+import { WhatsAppFloat } from "@/components/whatsapp-float"
 
 const _playfair = Playfair_Display({
   subsets: ["latin"],
@@ -32,6 +33,7 @@ export default function RootLayout({
           <CartProvider>
             {children}
             <CartSidebar />
+            <WhatsAppFloat />
           </CartProvider>
         </body>
     </html>
