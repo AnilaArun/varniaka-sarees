@@ -24,30 +24,30 @@ export function WhatsAppFloat() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
-      {/* Share Button */}
+    <>
+      {/* Share Button - Right middle edge */}
       <button
         onClick={handleShareToWhatsApp}
         onMouseEnter={() => setShowShare(true)}
         onMouseLeave={() => setShowShare(false)}
-        className="group flex items-center gap-2 rounded-full bg-[#25D366] p-3 text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
+        className="fixed right-0 top-1/2 z-50 flex -translate-y-1/2 items-center gap-2 rounded-l-full bg-[#25D366] py-3 pl-3 pr-2 text-white shadow-lg transition-all hover:pr-4 hover:shadow-xl"
         aria-label="Share on WhatsApp"
       >
-        {showShare && (
-          <span className="hidden pr-1 text-sm font-medium sm:inline">Share</span>
-        )}
         <Share2 className="h-5 w-5" />
+        {showShare && (
+          <span className="text-sm font-medium">Share</span>
+        )}
       </button>
 
-      {/* WhatsApp Chat Button */}
+      {/* WhatsApp Chat Button - Bottom right corner */}
       <button
         onClick={handleWhatsAppChat}
-        className="group flex items-center gap-2 rounded-full bg-[#25D366] p-4 text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-[#25D366] p-4 text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
         aria-label="Chat on WhatsApp"
       >
         <MessageCircle className="h-6 w-6" />
         <span className="hidden pr-1 text-sm font-medium sm:inline">Chat with us</span>
       </button>
-    </div>
+    </>
   )
 }
