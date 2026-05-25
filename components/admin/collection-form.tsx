@@ -38,6 +38,30 @@ export function CollectionForm({ initialData }: CollectionFormProps) {
       .replace(/(^-|-$)/g, "")
   }
 
+  const getSaveErrorMessage = (err: unknown) => {
+    if (
+      err &&
+      typeof err === "object" &&
+      ("code" in err || "status" in err || "message" in err)
+    ) {
+      const error = err as { code?: string; status?: number; message?: string }
+
+      if (
+        error.code === "23505" ||
+        error.status === 409 ||
+        error.message?.toLowerCase().includes("duplicate key")
+      ) {
+        return `A collection with the slug "${formData.slug}" already exists. Change the URL Slug and save again.`
+      }
+
+      if (error.message) {
+        return error.message
+      }
+    }
+
+    return "Failed to save collection"
+  }
+
   const handleNameChange = (name: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -63,8 +87,8 @@ export function CollectionForm({ initialData }: CollectionFormProps) {
       })
 
       if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || "Upload failed")
+        const data = await response.json().catch(() => null)
+        throw new Error(data?.error || `Upload failed with status ${response.status}`)
       }
 
       const { url } = await response.json()
@@ -105,7 +129,7 @@ export function CollectionForm({ initialData }: CollectionFormProps) {
       router.push("/admin/collections")
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save collection")
+      setError(getSaveErrorMessage(err))
     } finally {
       setLoading(false)
     }

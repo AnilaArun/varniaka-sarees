@@ -3,15 +3,27 @@ import { NextResponse } from "next/server"
 import Stripe from "stripe"
 import { createClient } from "@supabase/supabase-js"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+\export async function POST(request: Request) {
+  const stripeSecretKey = process.env.STRIPE_SECRET_KEY
+  const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-// Create Supabase admin client for webhook (bypasses RLS)
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+  if (
+    !stripeSecretKey ||
+    !stripeWebhookSecret ||
+    !supabaseUrl ||
+    !supabaseServiceRoleKey
+  ) {
+    return NextResponse.json(
+      { error: "Stripe webhook is not configured." },
+      { status: 500 },
+    )
+  }
 
-export async function POST(request: Request) {
+  const stripe = new Stripe(stripeSecretKey)
+  // Create Supabase admin client for webhook (bypasses RLS)
+  const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey)
   const body = await request.text()
   const headersList = await headers()
   const signature = headersList.get("stripe-signature")
@@ -27,7 +39,7 @@ export async function POST(request: Request) {
     event = stripe.webhooks.constructEvent(
       body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
+      stripeWebhookSecret
     )
     console.log("[v0] Webhook signature verified successfully")
   } catch (err) {
