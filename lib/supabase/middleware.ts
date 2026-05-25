@@ -1,6 +1,5 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import { getSupabaseEnv } from './env'
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -40,21 +39,11 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse
   }
 
-  let supabaseEnv
-  try {
-    supabaseEnv = getSupabaseEnv()
-  } catch (error) {
-    return new NextResponse(
-      error instanceof Error ? error.message : 'Supabase is not configured.',
-      { status: 500 },
-    )
-  }
-
   // With Fluid compute, don't put this client in a global environment
   // variable. Always create a new one on each request.
   const supabase = createServerClient(
-    supabaseEnv.url,
-    supabaseEnv.anonKey,
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {

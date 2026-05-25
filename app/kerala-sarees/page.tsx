@@ -123,12 +123,12 @@ export default async function KeralaSareesPage() {
                           >
                             View Details
                           </Link>
-                          {/* <Link
+                          <Link
                             href={`/product/${product.id}`}
                             className="flex items-center justify-center rounded-md bg-primary px-4 py-3 text-primary-foreground transition-colors hover:bg-primary/90"
                           >
                             Add to Cart
-                          </Link> */}
+                          </Link>
                         </div>
                       )}
                     </div>
