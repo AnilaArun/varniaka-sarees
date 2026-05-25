@@ -1,5 +1,4 @@
 import type { Metadata } from "next"
-import type { ReactNode } from "react"
 import { Playfair_Display, Lato } from "next/font/google"
 
 import "./globals.css"
@@ -26,25 +25,17 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: ReactNode
+  children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body className="font-sans antialiased">
-<<<<<<< HEAD
-        <CartProvider>
-          {children}
-          <CartSidebar />
-        </CartProvider>
-      </body>
-=======
           <CartProvider>
             {children}
             <CartSidebar />
             <WhatsAppFloat />
           </CartProvider>
         </body>
->>>>>>> main
     </html>
   )
 }
