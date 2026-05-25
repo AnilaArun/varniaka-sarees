@@ -8,9 +8,13 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient()
     const {
       data: { user },
+      error: authError,
     } = await supabase.auth.getUser()
 
+    console.log("[v0] Upload API - User:", user?.email || "none", "Auth error:", authError?.message || "none")
+
     if (!user) {
+      console.log("[v0] Upload API - Unauthorized, no user found")
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
