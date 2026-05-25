@@ -10,7 +10,7 @@ interface ProductActionsProps {
 
 export function ProductActions({ product }: ProductActionsProps) {
   return (
-    <div className="mt-8 space-y-4 border-t border-border pt-8">
+    {/* <div className="mt-8 space-y-4 border-t border-border pt-8">
       <AddToCartButton product={product} size="lg" className="w-full md:w-auto" />
       <p className="text-sm text-muted-foreground">
         Have questions? Contact us for availability and custom orders.
@@ -21,6 +21,6 @@ export function ProductActions({ product }: ProductActionsProps) {
       >
         Contact Us
       </Link>
-    </div>
+    </div> */}
   )
 }

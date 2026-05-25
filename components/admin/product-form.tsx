@@ -71,13 +71,39 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
       .replace(/(^-|-$)/g, "")
   }
 
+  const getSaveErrorMessage = (err: unknown) => {
+    if (
+      err &&
+      typeof err === "object" &&
+      ("code" in err || "status" in err || "message" in err)
+    ) {
+      const error = err as { code?: string; status?: number; message?: string }
+
+      if (
+        error.code === "23505" ||
+        error.status === 409 ||
+        error.message?.toLowerCase().includes("duplicate key")
+      ) {
+        return `A product with the slug "${formData.slug}" already exists. Change the URL Slug and save again.`
+      }
+
+      if (error.message) {
+        return error.message
+      }
+    }
+
+    return "Failed to save product"
+  }
+
   // Compress image before upload for better performance
   const compressImage = (file: File, maxWidth = 1200, quality = 0.8): Promise<Blob> => {
     return new Promise((resolve, reject) => {
       const img = new window.Image()
       img.crossOrigin = "anonymous"
+      const objectUrl = URL.createObjectURL(file)
       
       img.onload = () => {
+        URL.revokeObjectURL(objectUrl)
         const canvas = document.createElement("canvas")
         let width = img.width
         let height = img.height
@@ -112,8 +138,11 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
         )
       }
 
-      img.onerror = () => reject(new Error("Failed to load image"))
-      img.src = URL.createObjectURL(file)
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl)
+        reject(new Error("Failed to load image"))
+      }
+      img.src = objectUrl
     })
   }
 
@@ -161,8 +190,8 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
       setUploadProgress(90)
 
       if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || "Upload failed")
+        const data = await response.json().catch(() => null)
+        throw new Error(data?.error || `Upload failed with status ${response.status}`)
       }
 
       const { url } = await response.json()
@@ -216,7 +245,7 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
       router.push("/admin/products")
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save product")
+      setError(getSaveErrorMessage(err))
     } finally {
       setLoading(false)
     }
