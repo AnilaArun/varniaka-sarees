@@ -71,6 +71,30 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
       .replace(/(^-|-$)/g, "")
   }
 
+  const getSaveErrorMessage = (err: unknown) => {
+    if (
+      err &&
+      typeof err === "object" &&
+      ("code" in err || "status" in err || "message" in err)
+    ) {
+      const error = err as { code?: string; status?: number; message?: string }
+
+      if (
+        error.code === "23505" ||
+        error.status === 409 ||
+        error.message?.toLowerCase().includes("duplicate key")
+      ) {
+        return `A product with the slug "${formData.slug}" already exists. Change the URL Slug and save again.`
+      }
+
+      if (error.message) {
+        return error.message
+      }
+    }
+
+    return "Failed to save product"
+  }
+
   const handleNameChange = (name: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -96,8 +120,8 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
       })
 
       if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || "Upload failed")
+        const data = await response.json().catch(() => null)
+        throw new Error(data?.error || `Upload failed with status ${response.status}`)
       }
 
       const { url } = await response.json()
@@ -149,7 +173,7 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
       router.push("/admin/products")
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save product")
+      setError(getSaveErrorMessage(err))
     } finally {
       setLoading(false)
     }

@@ -1,6 +1,6 @@
 'use server'
 
-import { stripe } from '@/lib/stripe'
+import { getStripe } from '@/lib/stripe'
 import { getProductById } from '@/lib/products'
 import { createClient } from '@/lib/supabase/server'
 
@@ -77,6 +77,7 @@ export async function startCheckoutSession(cartItems: CartItem[]) {
 
   // Create Checkout Session with embedded UI
   // Store cart items in session metadata for webhook to use
+  const stripe = getStripe()
   const session = await stripe.checkout.sessions.create({
     ui_mode: 'embedded_page',
     redirect_on_completion: 'never',
@@ -143,6 +144,7 @@ export async function startCheckoutSession(cartItems: CartItem[]) {
 }
 
 export async function getCheckoutSession(sessionId: string) {
+  const stripe = getStripe()
   const session = await stripe.checkout.sessions.retrieve(sessionId)
   return {
     status: session.status,

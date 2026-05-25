@@ -30,14 +30,25 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const safeName = file.name
+      .toLowerCase()
+      .replace(/[^a-z0-9.]+/g, "-")
+      .replace(/(^-|-$)/g, "")
+    const fileName = safeName || "upload"
+
     // Upload to Vercel Blob
-    const blob = await put(`products/${Date.now()}-${file.name}`, file, {
+    const blob = await put(`products/${crypto.randomUUID()}-${fileName}`, file, {
       access: "public",
     })
 
     return NextResponse.json({ url: blob.url })
   } catch (error) {
     console.error("Upload error:", error)
-    return NextResponse.json({ error: "Upload failed" }, { status: 500 })
+    const message =
+      error instanceof Error && error.message
+        ? error.message
+        : "Upload failed"
+
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
