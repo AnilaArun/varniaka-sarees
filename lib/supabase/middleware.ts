@@ -6,11 +6,36 @@ export async function updateSession(request: NextRequest) {
     request,
   })
 
-  // Only run auth checks for admin routes to avoid rate limiting on public pages
+  // Only run auth checks for admin routes and protected API routes to avoid rate limiting on public pages
   const isAdminRoute = request.nextUrl.pathname.startsWith('/admin')
+  const isProtectedApiRoute = request.nextUrl.pathname.startsWith('/api/upload')
   
-  if (!isAdminRoute) {
-    // For non-admin routes, just pass through without auth check
+  if (!isAdminRoute && !isProtectedApiRoute) {
+    // For non-admin and non-protected API routes, just pass through without auth check
+    return supabaseResponse
+  }
+
+  // Allow access to the login and reset-password pages without full auth check
+  const isLoginPage = request.nextUrl.pathname === '/admin/login'
+  const isResetPasswordPage = request.nextUrl.pathname === '/admin/reset-password'
+
+  // Check if Supabase environment variables are configured
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  
+  if (!supabaseUrl || !supabaseAnonKey) {
+    // Supabase not configured - let login page handle showing the error
+    if (isLoginPage || isResetPasswordPage) {
+      return supabaseResponse
+    }
+    // For other admin routes without Supabase config, redirect to login page
+    if (isAdminRoute) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/admin/login'
+      url.searchParams.set('error', 'supabase_not_configured')
+      return NextResponse.redirect(url)
+    }
+    // For API routes, just pass through and let them handle the error
     return supabaseResponse
   }
 
@@ -49,15 +74,12 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Allow access to the login and reset-password pages without authentication
-  const isLoginPage = request.nextUrl.pathname === '/admin/login'
-  const isResetPasswordPage = request.nextUrl.pathname === '/admin/reset-password'
-  
   if (
     // if the user is not logged in and the admin path is accessed (except login/reset), redirect to the login page
     !isLoginPage &&
     !isResetPasswordPage &&
-    !user
+    !user &&
+    !isProtectedApiRoute // Don't redirect API routes - let them handle their own 401 response
   ) {
     // no user, redirect to the admin login page
     const url = request.nextUrl.clone()
