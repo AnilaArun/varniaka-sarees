@@ -31,20 +31,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="font-sans antialiased">
-<<<<<<< HEAD
         <CartProvider>
           {children}
           <CartSidebar />
+          <WhatsAppFloat />
         </CartProvider>
       </body>
-=======
-          <CartProvider>
-            {children}
-            <CartSidebar />
-            <WhatsAppFloat />
-          </CartProvider>
-        </body>
->>>>>>> main
     </html>
   )
 }
