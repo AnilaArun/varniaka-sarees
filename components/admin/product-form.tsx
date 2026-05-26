@@ -71,6 +71,30 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
       .replace(/(^-|-$)/g, "")
   }
 
+  const getSaveErrorMessage = (err: unknown) => {
+    if (
+      err &&
+      typeof err === "object" &&
+      ("code" in err || "status" in err || "message" in err)
+    ) {
+      const error = err as { code?: string; status?: number; message?: string }
+
+      if (
+        error.code === "23505" ||
+        error.status === 409 ||
+        error.message?.toLowerCase().includes("duplicate key")
+      ) {
+        return `A product with the slug "${formData.slug}" already exists. Change the URL Slug and save again.`
+      }
+
+      if (error.message) {
+        return error.message
+      }
+    }
+
+    return "Failed to save product"
+  }
+
   // Compress image before upload for better performance
   const compressImage = (file: File, maxWidth = 1200, quality = 0.8): Promise<Blob> => {
     return new Promise((resolve, reject) => {
@@ -120,30 +144,6 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
       }
       img.src = objectUrl
     })
-  }
-
-  const getSaveErrorMessage = (err: unknown) => {
-    if (
-      err &&
-      typeof err === "object" &&
-      ("code" in err || "status" in err || "message" in err)
-    ) {
-      const error = err as { code?: string; status?: number; message?: string }
-
-      if (
-        error.code === "23505" ||
-        error.status === 409 ||
-        error.message?.toLowerCase().includes("duplicate key")
-      ) {
-        return `A product with the slug "${formData.slug}" already exists. Change the URL Slug and save again.`
-      }
-
-      if (error.message) {
-        return error.message
-      }
-    }
-
-    return "Failed to save product"
   }
 
   const handleNameChange = (name: string) => {
