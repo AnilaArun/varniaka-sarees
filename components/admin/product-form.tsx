@@ -71,14 +71,15 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
       .replace(/(^-|-$)/g, "")
   }
 
-<<<<<<< HEAD
   // Compress image before upload for better performance
   const compressImage = (file: File, maxWidth = 1200, quality = 0.8): Promise<Blob> => {
     return new Promise((resolve, reject) => {
       const img = new window.Image()
       img.crossOrigin = "anonymous"
+      const objectUrl = URL.createObjectURL(file)
       
       img.onload = () => {
+        URL.revokeObjectURL(objectUrl)
         const canvas = document.createElement("canvas")
         let width = img.width
         let height = img.height
@@ -113,10 +114,14 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
         )
       }
 
-      img.onerror = () => reject(new Error("Failed to load image"))
-      img.src = URL.createObjectURL(file)
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl)
+        reject(new Error("Failed to load image"))
+      }
+      img.src = objectUrl
     })
-=======
+  }
+
   const getSaveErrorMessage = (err: unknown) => {
     if (
       err &&
@@ -139,7 +144,6 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
     }
 
     return "Failed to save product"
->>>>>>> 584e901 (some improvements to admin page and main page)
   }
 
   const handleNameChange = (name: string) => {

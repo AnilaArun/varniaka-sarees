@@ -3,7 +3,7 @@ import { NextResponse } from "next/server"
 import Stripe from "stripe"
 import { createClient } from "@supabase/supabase-js"
 
-\export async function POST(request: Request) {
+export async function POST(request: Request) {
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY
   const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL

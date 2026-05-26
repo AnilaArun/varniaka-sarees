@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/server"
 import { ProductCard } from "@/components/product-card"
 
 // Static products from original data (Kalyani Cotton)
-const staticProducts = getProductsByCategory("handloom-cotton")
+const staticProducts = getProductsByCategory("kalyani-cotton")
 
 export default async function HandloomCottonPage() {
   // Fetch products from database

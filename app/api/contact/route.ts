@@ -3,7 +3,6 @@ import { NextResponse } from "next/server"
 
 export async function POST(request: Request) {
   try {
-<<<<<<< HEAD
     // Check for API key at runtime, not build time
     if (!process.env.RESEND_API_KEY) {
       return NextResponse.json(
@@ -14,16 +13,6 @@ export async function POST(request: Request) {
     
     const resend = new Resend(process.env.RESEND_API_KEY)
     
-=======
-    if (!process.env.RESEND_API_KEY) {
-      return NextResponse.json(
-        { error: "Email service is not configured. Missing RESEND_API_KEY." },
-        { status: 500 }
-      )
-    }
-
-    const resend = new Resend(process.env.RESEND_API_KEY)
->>>>>>> 584e901 (some improvements to admin page and main page)
     const body = await request.json()
     const { name, email, phone, subject, message } = body
 
