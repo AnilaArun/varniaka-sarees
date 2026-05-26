@@ -1,8 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useMemo, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
+
+const isSupabaseConfigured = Boolean(
+  process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+)
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("")
@@ -11,11 +16,24 @@ export default function ResetPasswordPage() {
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  const supabase = createClient()
+  const supabase = useMemo(() => {
+    if (!isSupabaseConfigured) return null
+
+    try {
+      return createClient()
+    } catch {
+      return null
+    }
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
+
+    if (!supabase) {
+      setError("Supabase is not configured. Please add valid Supabase credentials.")
+      return
+    }
 
     if (password !== confirmPassword) {
       setError("Passwords do not match")

@@ -27,7 +27,11 @@ function AdminLoginForm() {
   // Only create client if configured - use useMemo to avoid recreating on every render
   const supabase = useMemo(() => {
     if (!supabaseConfigured) return null
-    return createClient()
+    try {
+      return createClient()
+    } catch {
+      return null
+    }
   }, [supabaseConfigured])
 
   const handleSubmit = async (e: React.FormEvent) => {
