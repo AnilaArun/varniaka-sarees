@@ -3,7 +3,42 @@
 import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { Camera, Upload, X, Loader2, Plus, Trash2 } from "lucide-react"
+import { Camera, Upload, X, Loader2 } from "lucide-react"
+
+type ProductImageKey = "main" | "body" | "pallu" | "blouse" | "dummy"
+type ProductImages = Partial<Record<ProductImageKey, string>>
+
+const IMAGE_SLOTS: Array<{
+  key: ProductImageKey
+  label: string
+  description: string
+}> = [
+  {
+    key: "main",
+    label: "Main photo",
+    description: "Used on product cards and as the first product image.",
+  },
+  {
+    key: "body",
+    label: "Body",
+    description: "Close-up of the saree body.",
+  },
+  {
+    key: "pallu",
+    label: "Pallu",
+    description: "Pallu design and border details.",
+  },
+  {
+    key: "blouse",
+    label: "Blouse",
+    description: "Blouse piece or blouse fabric.",
+  },
+  {
+    key: "dummy",
+    label: "On dummy",
+    description: "Saree draped on a dummy or mannequin.",
+  },
+]
 
 interface Collection {
   id: string
@@ -27,6 +62,7 @@ interface ProductFormProps {
     blouse: string | null
     care: string | null
     stock: number | null
+    product_images?: ProductImages | null
   }
 }
 
@@ -38,6 +74,15 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
   const [loading, setLoading] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [activeUploadSlot, setActiveUploadSlot] = useState<ProductImageKey | null>(null)
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const [productImages, setProductImages] = useState<ProductImages>(() => {
+    const images = initialData?.product_images || {}
+    return {
+      ...images,
+      main: images.main || initialData?.image_url || "",
+    }
+  })
 
   const [formData, setFormData] = useState({
     name: initialData?.name || "",
@@ -53,6 +98,10 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
     care: initialData?.care || "Dry clean recommended",
     stock: initialData?.stock?.toString() || "1",
   })
+
+  const hasAtLeastOneImage = IMAGE_SLOTS.some(
+    ({ key }) => Boolean(productImages[key])
+  )
 
   // Auto-fill fabric when collection changes
   useEffect(() => {
@@ -93,6 +142,20 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
     }
 
     return "Failed to save product"
+  }
+
+  const isMissingProductImagesColumnError = (err: unknown) => {
+    if (!err || typeof err !== "object" || !("message" in err)) {
+      return false
+    }
+
+    const message = String((err as { message?: unknown }).message).toLowerCase()
+    return (
+      message.includes("product_images") &&
+      (message.includes("schema cache") ||
+        message.includes("could not find") ||
+        message.includes("column"))
+    )
   }
 
   // Compress image before upload for better performance
@@ -154,11 +217,44 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
     }))
   }
 
-  const [uploadProgress, setUploadProgress] = useState(0)
+  const getPrimaryImageUrl = (images: ProductImages) => {
+    return (
+      images.main ||
+      IMAGE_SLOTS.map(({ key }) => images[key]).find(Boolean) ||
+      ""
+    )
+  }
+
+  const cleanProductImages = (images: ProductImages) => {
+    return IMAGE_SLOTS.reduce<ProductImages>((acc, { key }) => {
+      const value = images[key]
+      if (value) {
+        acc[key] = value
+      }
+      return acc
+    }, {})
+  }
+
+  const startImageUpload = (slot: ProductImageKey) => {
+    setActiveUploadSlot(slot)
+    fileInputRef.current?.click()
+  }
+
+  const removeImage = (slot: ProductImageKey) => {
+    setProductImages((prev) => {
+      const next = { ...prev, [slot]: "" }
+      setFormData((form) => ({ ...form, image_url: getPrimaryImageUrl(next) }))
+      return next
+    })
+  }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (!file) return
+    const slot = activeUploadSlot
+
+    e.target.value = ""
+
+    if (!file || !slot) return
 
     setUploading(true)
     setUploadProgress(10)
@@ -195,13 +291,18 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
       }
 
       const { url } = await response.json()
-      setFormData((prev) => ({ ...prev, image_url: url }))
+      setProductImages((prev) => {
+        const next = { ...prev, [slot]: url }
+        setFormData((form) => ({ ...form, image_url: getPrimaryImageUrl(next) }))
+        return next
+      })
       setUploadProgress(100)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed")
     } finally {
       setUploading(false)
       setUploadProgress(0)
+      setActiveUploadSlot(null)
     }
   }
 
@@ -211,7 +312,14 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
     setError(null)
 
     try {
+      if (!hasAtLeastOneImage) {
+        setError("Please upload at least one product photo.")
+        return
+      }
+
       const priceInCents = Math.round(parseFloat(formData.price) * 100)
+      const cleanedProductImages = cleanProductImages(productImages)
+      const primaryImageUrl = getPrimaryImageUrl(cleanedProductImages)
 
       const productData = {
         name: formData.name,
@@ -219,7 +327,8 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
         price: parseFloat(formData.price),
         price_in_cents: priceInCents,
         description: formData.description,
-        image_url: formData.image_url,
+        image_url: primaryImageUrl,
+        product_images: cleanedProductImages,
         collection_id: formData.collection_id || null,
         fabric: formData.fabric || null,
         length: formData.length || null,
@@ -229,18 +338,31 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
         stock: parseInt(formData.stock) || 0,
       }
 
-      if (initialData?.id) {
-        const { error } = await supabase
-          .from("products")
-          .update(productData)
-          .eq("id", initialData.id)
+      const saveProduct = async (
+        data: typeof productData | Omit<typeof productData, "product_images">
+      ) => {
+        if (initialData?.id) {
+          return supabase
+            .from("products")
+            .update(data)
+            .eq("id", initialData.id)
+        }
 
-        if (error) throw error
-      } else {
-        const { error } = await supabase.from("products").insert(productData)
-
-        if (error) throw error
+        return supabase.from("products").insert(data)
       }
+
+      const saveProductWithoutAdditionalImages = async () => {
+        const { product_images: _productImages, ...fallbackProductData } = productData
+        return saveProduct(fallbackProductData)
+      }
+
+      let saveResult = await saveProduct(productData)
+
+      if (saveResult.error && isMissingProductImagesColumnError(saveResult.error)) {
+        saveResult = await saveProductWithoutAdditionalImages()
+      }
+
+      if (saveResult.error) throw saveResult.error
 
       router.push("/admin/products")
       router.refresh()
@@ -259,78 +381,92 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
         </div>
       )}
 
-      {/* Image Upload - Mobile Optimized */}
-      <div className="space-y-2">
-        <label className="block text-sm font-medium">Product Image</label>
-        <div className="flex flex-col items-center gap-4">
-          {formData.image_url ? (
-            <div className="relative aspect-square w-full max-w-xs overflow-hidden rounded-lg border">
-              <img
-                src={formData.image_url}
-                alt="Product preview"
-                className="h-full w-full object-cover"
-              />
-              <button
-                type="button"
-                onClick={() => setFormData((prev) => ({ ...prev, image_url: "" }))}
-                className="absolute right-2 top-2 rounded-full bg-background/80 p-1 backdrop-blur-sm"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          ) : (
-            <div
-              onClick={() => !uploading && fileInputRef.current?.click()}
-              className={`flex aspect-square w-full max-w-xs flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed bg-muted/50 transition-colors ${
-                uploading 
-                  ? "border-primary/50 cursor-wait" 
-                  : "border-muted-foreground/25 cursor-pointer hover:border-primary/50 hover:bg-muted"
-              }`}
-            >
-              {uploading ? (
-                <div className="flex flex-col items-center gap-3">
-                  <Loader2 className="h-10 w-10 animate-spin text-primary" />
-                  <div className="w-32">
-                    <div className="h-2 w-full rounded-full bg-muted">
-                      <div 
-                        className="h-2 rounded-full bg-primary transition-all duration-300"
-                        style={{ width: `${uploadProgress}%` }}
-                      />
-                    </div>
-                    <p className="mt-2 text-center text-xs text-muted-foreground">
-                      {uploadProgress < 50 ? "Compressing..." : "Uploading..."}
-                    </p>
-                  </div>
+      {/* Product Photos */}
+      <div className="space-y-3">
+        <div>
+          <label className="block text-sm font-medium">Product Photos *</label>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Add any of these optional views. At least one photo is required.
+          </p>
+        </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          onChange={handleImageUpload}
+          className="hidden"
+        />
+        <div className="grid gap-4 sm:grid-cols-2">
+          {IMAGE_SLOTS.map((slot) => {
+            const imageUrl = productImages[slot.key]
+            const isUploadingThisSlot = uploading && activeUploadSlot === slot.key
+
+            return (
+              <div key={slot.key} className="rounded-lg border bg-card p-3">
+                <div className="mb-3">
+                  <p className="text-sm font-medium">{slot.label}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {slot.description}
+                  </p>
                 </div>
-              ) : (
-                <>
-                  <Camera className="h-12 w-12 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">
-                    Tap to take or select photo
-                  </span>
-                </>
-              )}
-            </div>
-          )}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={handleImageUpload}
-            className="hidden"
-          />
-          {!formData.image_url && (
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-              className="flex items-center gap-2 rounded-md border px-4 py-2 text-sm transition-colors hover:bg-muted"
-            >
-              <Upload className="h-4 w-4" />
-              Upload from gallery
-            </button>
-          )}
+
+                {imageUrl ? (
+                  <div className="relative aspect-square overflow-hidden rounded-md border">
+                    <img
+                      src={imageUrl}
+                      alt={`${slot.label} preview`}
+                      className="h-full w-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(slot.key)}
+                      className="absolute right-2 top-2 rounded-full bg-background/85 p-1 backdrop-blur-sm"
+                      aria-label={`Remove ${slot.label}`}
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => !uploading && startImageUpload(slot.key)}
+                    disabled={uploading}
+                    className={`flex aspect-square w-full flex-col items-center justify-center gap-3 rounded-md border-2 border-dashed bg-muted/50 transition-colors ${
+                      uploading
+                        ? "cursor-wait border-primary/50"
+                        : "cursor-pointer border-muted-foreground/25 hover:border-primary/50 hover:bg-muted"
+                    }`}
+                  >
+                    {isUploadingThisSlot ? (
+                      <div className="flex flex-col items-center gap-3">
+                        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                        <div className="w-32">
+                          <div className="h-2 w-full rounded-full bg-muted">
+                            <div
+                              className="h-2 rounded-full bg-primary transition-all duration-300"
+                              style={{ width: `${uploadProgress}%` }}
+                            />
+                          </div>
+                          <p className="mt-2 text-center text-xs text-muted-foreground">
+                            {uploadProgress < 50 ? "Compressing..." : "Uploading..."}
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <Camera className="h-10 w-10 text-muted-foreground" />
+                        <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Upload className="h-4 w-4" />
+                          Upload photo
+                        </span>
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+            )
+          })}
         </div>
       </div>
 
@@ -549,7 +685,7 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
         </button>
         <button
           type="submit"
-          disabled={loading || !formData.name || !formData.price}
+          disabled={loading || !formData.name || !formData.price || !hasAtLeastOneImage}
           className="flex-1 rounded-md bg-primary px-4 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
         >
           {loading ? "Saving..." : initialData ? "Update Product" : "Add Product"}
