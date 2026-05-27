@@ -5,6 +5,7 @@ import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { createClient } from "@/lib/supabase/server"
 import { ProductActionsDB } from "@/components/product-actions-db"
+import { ProductImageGallery } from "@/components/product-image-gallery"
 
 type ProductImageKey = "main" | "body" | "pallu" | "blouse" | "dummy"
 type ProductImages = Partial<Record<ProductImageKey, string>>
@@ -107,7 +108,6 @@ export default async function ProductDetailPage({
       return entries.findIndex((other) => other[1] === entry[1]) === index
     })
     .map(([key, url]) => ({ key, label: PRODUCT_IMAGE_LABELS[key], url }))
-  const primaryImage = productImages[0]
 
   return (
     <main className="min-h-screen bg-background">
@@ -145,54 +145,11 @@ export default async function ProductDetailPage({
           </Link>
 
           <div className="grid gap-12 lg:grid-cols-2">
-            {/* Product Images */}
-            <div className="space-y-4">
-              <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-muted">
-                {primaryImage ? (
-                  <img
-                    src={primaryImage.url}
-                    alt={`${product.name} - ${primaryImage.label}`}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center">
-                    <span className="text-muted-foreground">No image</span>
-                  </div>
-                )}
-                {product.stock === 0 && (
-                  <span className="absolute left-3 top-3 bg-primary px-3 py-1 text-[10px] tracking-wider text-primary-foreground">
-                    OUT OF STOCK
-                  </span>
-                )}
-                {product.stock === 1 && (
-                  <span className="absolute left-3 top-3 bg-amber-500 px-3 py-1 text-[10px] tracking-wider text-white">
-                    ONLY 1 LEFT
-                  </span>
-                )}
-              </div>
-
-              {productImages.length > 1 && (
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  {productImages.map((image) => (
-                    <figure
-                      key={`${image.key}-${image.url}`}
-                      className="overflow-hidden rounded-md border bg-card"
-                    >
-                      <div className="aspect-square overflow-hidden bg-muted">
-                        <img
-                          src={image.url}
-                          alt={`${product.name} - ${image.label}`}
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                      <figcaption className="px-2 py-1.5 text-center text-xs text-muted-foreground">
-                        {image.label}
-                      </figcaption>
-                    </figure>
-                  ))}
-                </div>
-              )}
-            </div>
+            <ProductImageGallery
+              images={productImages}
+              productName={product.name}
+              stock={product.stock}
+            />
 
             {/* Product Info */}
             <div className="flex flex-col">
