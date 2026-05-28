@@ -4,7 +4,63 @@ import { Share2 } from "lucide-react"
 import { useEffect, useState } from "react"
 
 const WHATSAPP_NUMBER = "447721943635"
-const CHAT_TEXT = "Hi, I'm interested in your saree collection. Can you help me?"
+const DEFAULT_CHAT_TEXT =
+  "Hi, I'm interested in your saree collection. Can you help me?"
+
+const COLLECTION_NAMES: Record<string, string> = {
+  "/all-sarees": "All Sarees",
+  "/banarasi": "Banarasi Sarees",
+  "/handloom-cotton": "Handloom Cotton Sarees",
+  "/kalyani-cotton": "Kalyani Cotton Sarees",
+  "/kerala-sarees": "Kerala Sarees",
+  "/linen": "Linen Sarees",
+  "/maheswari-cotton": "Maheswari Cotton Sarees",
+  "/maheshwari-cotton": "Maheshwari Cotton Sarees",
+  "/mul-cotton": "Mul Cotton Sarees",
+  "/organza": "Organza Sarees",
+  "/semi-silk": "Semi Silk Sarees",
+  "/silk-sarees": "Silk Sarees",
+}
+
+function getPageHeading() {
+  return document.querySelector("h1")?.textContent?.trim()
+}
+
+function buildChatText(pathname: string, pageUrl: string) {
+  if (pathname.startsWith("/product/")) {
+    const productName = getPageHeading() || "this saree"
+
+    return (
+      `Hi, I'm looking at ${productName} on Varnika Sarees.\n\n` +
+      `Could you confirm availability and share more details?\n\n` +
+      pageUrl
+    )
+  }
+
+  const collectionName = COLLECTION_NAMES[pathname]
+
+  if (collectionName) {
+    return (
+      `Hi, I'm looking at ${collectionName} on Varnika Sarees.\n\n` +
+      `Could you help me with more collections or similar sarees?\n\n` +
+      pageUrl
+    )
+  }
+
+  return (
+    `Hi, I'm interested in your saree collection.\n\n` +
+    `Could you help me find available sarees and latest collections?\n\n` +
+    pageUrl
+  )
+}
+
+function buildShareText(pathname: string, pageUrl: string) {
+  const pageName = pathname.startsWith("/product/")
+    ? getPageHeading() || "this saree from Varnika"
+    : COLLECTION_NAMES[pathname] || "Varnika Sarees"
+
+  return `Have a look at ${pageName}.\n\n${pageUrl}`
+}
 
 function WhatsAppLogo({ className }: { className?: string }) {
   return (
@@ -24,11 +80,20 @@ export function WhatsAppFloat() {
   const [shareHref, setShareHref] = useState(
     "https://wa.me/?text=Check%20out%20this%20beautiful%20saree%20collection%20from%20Varnika!"
   )
+  const [chatHref, setChatHref] = useState(
+    `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(DEFAULT_CHAT_TEXT)}`
+  )
 
   useEffect(() => {
+    const pageUrl = window.location.href
+    const pathname = window.location.pathname
+
     setShareHref(
-      `https://wa.me/?text=${encodeURIComponent(
-        `Check out this beautiful saree collection from Varnika!\n\n${window.location.href}`
+      `https://wa.me/?text=${encodeURIComponent(buildShareText(pathname, pageUrl))}`
+    )
+    setChatHref(
+      `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+        buildChatText(pathname, pageUrl)
       )}`
     )
   }, [])
@@ -53,7 +118,7 @@ export function WhatsAppFloat() {
 
       {/* WhatsApp Chat Button - Bottom right corner */}
       <a
-        href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(CHAT_TEXT)}`}
+        href={chatHref}
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-6 right-6 z-[60] flex items-center gap-2 rounded-full bg-[#25D366] p-4 text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
