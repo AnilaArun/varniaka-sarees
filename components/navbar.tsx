@@ -6,7 +6,12 @@ import Image from "next/image"
 import { Menu, X, ChevronDown, Search } from "lucide-react"
 import { CartButton } from "@/components/cart-button"
 
-const collections = [
+type CollectionLink = {
+  href: string
+  label: string
+}
+
+const fallbackCollections: CollectionLink[] = [
   { href: "/silk-sarees", label: "Silk Sarees" },
   { href: "/semi-silk", label: "Semi Silk" },
   { href: "/banarasi", label: "Banarasi" },
@@ -30,6 +35,7 @@ export function Navbar() {
   const [collectionsOpen, setCollectionsOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [collections, setCollections] = useState<CollectionLink[]>(fallbackCollections)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const searchRef = useRef<HTMLDivElement>(null)
 
@@ -37,6 +43,25 @@ export function Navbar() {
   const filteredCollections = collections.filter((c) =>
     c.label.toLowerCase().includes(searchQuery.toLowerCase())
   )
+
+  useEffect(() => {
+    let isMounted = true
+
+    fetch("/api/collections")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { collections?: CollectionLink[] } | null) => {
+        if (isMounted && data?.collections?.length) {
+          setCollections(data.collections)
+        }
+      })
+      .catch(() => {
+        // Keep the static fallback links if the API is unavailable.
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   // Close dropdown when clicking outside
   useEffect(() => {

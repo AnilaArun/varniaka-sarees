@@ -3,18 +3,13 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
-import { getProductsByCategory } from "@/lib/products"
 import { createClient } from "@/lib/supabase/server"
-import { ProductCard } from "@/components/product-card"
-
-// Static products from original data (Kalyani Cotton)
-const staticProducts = getProductsByCategory("kalyani-cotton")
 
 export default async function HandloomCottonPage() {
   // Fetch products from database
   const supabase = await createClient()
   
-  // Get all cotton-related products from database
+  // Get Handloom Cotton products from database
   const { data: dbProducts } = await supabase
     .from("products")
     .select(`
@@ -24,11 +19,9 @@ export default async function HandloomCottonPage() {
     .eq("is_active", true)
     .order("created_at", { ascending: false })
 
-  // Filter to only cotton-related products
+  // Filter to only products assigned to the Handloom Cotton collection.
   const cottonProducts = (dbProducts || []).filter((p: any) => 
-    p.collections?.slug?.toLowerCase().includes('cotton') ||
-    p.collections?.name?.toLowerCase().includes('cotton') ||
-    p.name?.toLowerCase().includes('cotton')
+    p.collections?.slug === 'handloom-cotton'
   )
 
   return (
@@ -58,31 +51,6 @@ export default async function HandloomCottonPage() {
           </p>
         </div>
       </section>
-
-      {/* Kalyani Cotton Section - Static Products */}
-      {staticProducts.length > 0 && (
-        <section className="px-6 py-16 lg:px-8 lg:py-24">
-          <div className="mx-auto max-w-7xl">
-            <div className="mb-12 text-center">
-              <span className="text-xs tracking-[0.4em] text-muted-foreground">
-                KALYANI COTTON
-              </span>
-              <h2 className="mt-4 font-serif text-3xl text-foreground md:text-4xl">
-                Everyday Elegance
-              </h2>
-              <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
-                Soft, lightweight, and breathable Kalyani cotton fabric designed for everyday elegance.
-              </p>
-            </div>
-
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {staticProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Database Products Section */}
       {cottonProducts.length > 0 && (

@@ -1,6 +1,7 @@
 "use client"
 
 import { Share2 } from "lucide-react"
+import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 
 const WHATSAPP_NUMBER = "447721943635"
@@ -76,6 +77,7 @@ function WhatsAppLogo({ className }: { className?: string }) {
 }
 
 export function WhatsAppFloat() {
+  const pathname = usePathname()
   const [showShare, setShowShare] = useState(false)
   const [shareHref, setShareHref] = useState(
     "https://wa.me/?text=Check%20out%20this%20beautiful%20saree%20collection%20from%20Varnika!"
@@ -86,7 +88,10 @@ export function WhatsAppFloat() {
 
   useEffect(() => {
     const pageUrl = window.location.href
-    const pathname = window.location.pathname
+
+    if (pathname.startsWith("/admin")) {
+      return
+    }
 
     setShareHref(
       `https://wa.me/?text=${encodeURIComponent(buildShareText(pathname, pageUrl))}`
@@ -96,7 +101,11 @@ export function WhatsAppFloat() {
         buildChatText(pathname, pageUrl)
       )}`
     )
-  }, [])
+  }, [pathname])
+
+  if (pathname.startsWith("/admin")) {
+    return null
+  }
 
   return (
     <>

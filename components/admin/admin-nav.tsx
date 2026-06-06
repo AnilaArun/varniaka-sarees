@@ -50,6 +50,27 @@ export function AdminNav({ userEmail }: AdminNavProps) {
         })}
       </nav>
 
+      <nav className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-4 border-t bg-background px-2 py-2 shadow-lg md:hidden">
+        {navItems.map((item) => {
+          const Icon = item.icon
+          const isActive = pathname === item.href
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-md px-2 text-[11px] font-medium transition-colors ${
+                isActive
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+            >
+              <Icon className="h-5 w-5" />
+              <span className="text-center leading-tight">{item.label}</span>
+            </Link>
+          )
+        })}
+      </nav>
+
       <div className="flex items-center gap-3 border-l pl-4">
         <span className="hidden text-sm text-muted-foreground md:block">
           {userEmail}

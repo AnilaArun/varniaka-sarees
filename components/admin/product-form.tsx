@@ -393,7 +393,6 @@ export function ProductForm({ collections, initialData }: ProductFormProps) {
           ref={fileInputRef}
           type="file"
           accept="image/*"
-          capture="environment"
           onChange={handleImageUpload}
           className="hidden"
         />

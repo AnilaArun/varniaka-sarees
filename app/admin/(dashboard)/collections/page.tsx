@@ -9,7 +9,7 @@ export default async function AdminCollectionsPage() {
   const { data: collections } = await supabase
     .from("collections")
     .select("*, products(count)")
-    .order("created_at", { ascending: false })
+    .order("name", { ascending: true })
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">

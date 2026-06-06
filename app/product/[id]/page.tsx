@@ -84,15 +84,27 @@ export default async function ProductDetailPage({
 
   // Map old/inconsistent collection slugs to correct page routes
   const slugToRoute: Record<string, string> = {
-    "handloom-cotton": "maheshwari-cotton",
     "maheswari-cotton": "maheshwari-cotton",
   }
 
   const collectionSlug = product.collection?.slug || ""
   const correctedSlug = slugToRoute[collectionSlug] || collectionSlug
+  const rootCollectionRoutes = new Set([
+    "silk-sarees",
+    "semi-silk",
+    "banarasi",
+    "maheshwari-cotton",
+    "kalyani-cotton",
+    "mul-cotton",
+    "linen",
+    "organza",
+    "kerala-sarees",
+  ])
 
-  const categoryHref = correctedSlug 
-    ? `/${correctedSlug}`
+  const categoryHref = correctedSlug
+    ? rootCollectionRoutes.has(correctedSlug)
+      ? `/${correctedSlug}`
+      : `/collections/${correctedSlug}`
     : "/all-sarees"
   
   const categoryLabel = product.collection?.name || "All Sarees"

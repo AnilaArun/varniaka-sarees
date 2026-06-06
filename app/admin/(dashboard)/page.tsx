@@ -24,7 +24,10 @@ export default async function AdminDashboardPage() {
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <div className="rounded-lg border bg-background p-6">
+        <Link
+          href="/admin/products"
+          className="block rounded-lg border bg-background p-6 transition-colors hover:bg-muted/50"
+        >
           <div className="flex items-center gap-4">
             <div className="rounded-full bg-primary/10 p-3">
               <Package className="h-6 w-6 text-primary" />
@@ -34,9 +37,12 @@ export default async function AdminDashboardPage() {
               <p className="text-2xl font-bold">{productCount || 0}</p>
             </div>
           </div>
-        </div>
+        </Link>
 
-        <div className="rounded-lg border bg-background p-6">
+        <Link
+          href="/admin/collections"
+          className="block rounded-lg border bg-background p-6 transition-colors hover:bg-muted/50"
+        >
           <div className="flex items-center gap-4">
             <div className="rounded-full bg-primary/10 p-3">
               <FolderOpen className="h-6 w-6 text-primary" />
@@ -46,7 +52,7 @@ export default async function AdminDashboardPage() {
               <p className="text-2xl font-bold">{collectionCount || 0}</p>
             </div>
           </div>
-        </div>
+        </Link>
 
         <div className="rounded-lg border bg-background p-6">
           <Link

@@ -183,7 +183,6 @@ export function CollectionForm({ initialData }: CollectionFormProps) {
             ref={fileInputRef}
             type="file"
             accept="image/*"
-            capture="environment"
             onChange={handleImageUpload}
             className="hidden"
           />

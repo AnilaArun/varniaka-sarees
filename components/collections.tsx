@@ -1,7 +1,7 @@
-import Image from "next/image"
 import Link from "next/link"
+import { createClient } from "@/lib/supabase/server"
 
-const collections = [
+const fallbackCollections = [
   {
     title: "Silk Sarees",
     description: "Luxurious Banarasi & Kanjeevaram silks with intricate zari work",
@@ -67,11 +67,68 @@ const collections = [
   },
 ]
 
-export function Collections() {
+type DbCollection = {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  image_url: string | null
+  products?: Array<{ count: number }>
+}
+
+const collectionCoverFallbacks: Record<string, string> = {
+  banarasi: "/images/banarasi-saree.jpg",
+  "kalyani-cotton": "/images/kalyani-cotton-saree.jpg",
+  "kerala-saree": "/images/kerala-saree.jpg",
+  "kerala-sarees": "/images/kerala-saree.jpg",
+  linen: "/images/linen-saree.jpg",
+  "maheswari-cotton": "/images/maheshwari-cotton-saree.jpg",
+  "maheshwari-cotton": "/images/maheshwari-cotton-saree.jpg",
+  "mul-cotton": "/images/mul-cotton-saree.jpg",
+  organza: "/images/organza-saree.jpg",
+  "semi-silk": "/images/semi-silk-saree1.jpg",
+  "silk-sarees": "/images/silk-saree.png",
+}
+
+async function getCollections() {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from("collections")
+    .select("id, name, slug, description, image_url, products(count)")
+    .order("name", { ascending: true })
+
+  if (error || !data?.length) {
+    return fallbackCollections.toSorted((a, b) => a.title.localeCompare(b.title))
+  }
+
+  return (data as DbCollection[])
+    .map((collection) => {
+      const productCount = collection.products?.[0]?.count || 0
+
+      return {
+        title: collection.name,
+        description:
+          collection.description ||
+          "Explore handcrafted sarees selected for this collection.",
+        image:
+          collection.image_url ||
+          collectionCoverFallbacks[collection.slug] ||
+          "",
+        count: `${productCount} ${productCount === 1 ? "Piece" : "Pieces"}`,
+        href: `/collections/${collection.slug}`,
+        productCount,
+      }
+    })
+    .filter((collection) => collection.productCount > 0)
+}
+
+export async function Collections() {
+  const collections = await getCollections()
+
   return (
     <section id="collections" className="bg-background px-6 py-20 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        {/* Header */}
         <div className="mb-16 text-center">
           <span className="text-xs tracking-[0.4em] text-muted-foreground">
             OUR COLLECTIONS
@@ -85,22 +142,27 @@ export function Collections() {
           </p>
         </div>
 
-        {/* Collection Grid */}
         <div className="grid gap-8 md:grid-cols-3">
           {collections.map((col) => (
             <Link
-              key={col.title}
+              key={col.href}
               href={col.href}
               className="group relative overflow-hidden"
             >
-              <div className="relative aspect-[3/4] overflow-hidden">
-                <Image
-                  src={col.image}
-                  alt={col.title}
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                />
+              <div className="relative aspect-[3/4] overflow-hidden bg-muted">
+                {col.image ? (
+                  <img
+                    src={col.image}
+                    alt={col.title}
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center">
+                    <span className="text-sm text-muted-foreground">
+                      No image
+                    </span>
+                  </div>
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-6">
                   <span className="text-[10px] tracking-[0.3em] text-accent/80">
